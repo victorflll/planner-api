@@ -30,7 +30,7 @@ model Member {
   id     String  @id @default(uuid())
   tripId String  @default(uuid()) @map("trip_id")
   trip   Trip    @relation(fields: [tripId], references: [id])
-  name   String
+  name   String?
   email  String
   owner  Boolean
   status Boolean
