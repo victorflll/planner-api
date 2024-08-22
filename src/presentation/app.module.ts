@@ -5,9 +5,10 @@ import {PrismaService} from "../infrastructure/prisma.service";
 import {TripRepository} from "../infrastructure/repositories/trip.repository";
 import {ITripRepository} from "../domain/ports/interface.trip.repository";
 import {ITripService} from "../domain/ports/interface.trip.service";
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-    imports: [],
+    imports: [HttpModule],
     controllers: [TripController],
     providers: [
         PrismaService,

@@ -4,11 +4,17 @@ import {CreateTripDto} from "../models/create.trip.dto";
 import {Trip} from "@prisma/client";
 import {UpdateTripDto} from "../models/update.trip.dto";
 import {ITripRepository} from "../ports/interface.trip.repository";
+import {LocationModel} from "../models/locationModel";
 
 @Injectable()
 export class TripService implements ITripService {
     constructor(private tripRepository: ITripRepository) {
     }
+
+    getCities(): Promise<LocationModel[]> {
+        return this.tripRepository.getCities();
+    }
+
 
     create(data: CreateTripDto): void {
         this.tripRepository.create(data);

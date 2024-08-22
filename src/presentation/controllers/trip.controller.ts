@@ -20,6 +20,11 @@ export class TripController {
         return await this.tripService.get();
     }
 
+    @Get('/cities')
+    async getCities() {
+        return await this.tripService.getCities();
+    }
+
     @Get('/:id')
     async getById(@Param('id') id: string) {
         return await this.tripService.getById(id);
