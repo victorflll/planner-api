@@ -5,10 +5,12 @@ import {Trip} from "@prisma/client";
 import {UpdateTripDto} from "../models/trip/update.trip.dto";
 import {ITripRepository} from "../ports/trip/interface.trip.repository";
 import {LocationModel} from "../models/trip/location.model";
+import {IMemberService} from "../ports/member/interface.member.service";
+import {IMemberRepository} from "../ports/member/interface.member.repository";
 
 @Injectable()
 export class TripService implements ITripService {
-    constructor(private tripRepository: ITripRepository) {
+    constructor(private tripRepository: ITripRepository, private memberRepository: IMemberRepository) {
     }
 
     getCities(): Promise<LocationModel[]> {
@@ -16,8 +18,10 @@ export class TripService implements ITripService {
     }
 
 
-    create(data: CreateTripDto): void {
-        this.tripRepository.create(data);
+    async create(data: CreateTripDto) {
+        const tripId = await this.tripRepository.create(data);
+
+        this.memberRepository.create(data.members, tripId);
     }
 
     delete(id: string): void {

@@ -4,45 +4,39 @@ import {IMemberRepository} from "../../domain/ports/member/interface.member.repo
 import {PrismaService} from "../prisma.service";
 import {UpdateMemberDto} from "../../domain/models/member/update.member.dto";
 import {MemberDto} from "../../domain/models/member/member.dto";
+import {Injectable} from "@nestjs/common";
+import {TripOwner} from "../../domain/models/trip/trip.owner.model";
 
+@Injectable()
 export class MemberRepository implements IMemberRepository {
     constructor(private readonly prismaService: PrismaService) {
     }
 
-    async create(data: CreateMemberDto) {
-        await this.prismaService.member.create({
-            data: {
-                email: data.email,
-                owner: data.owner,
-                status: data.owner,
-            },
+    async create(data: CreateMemberDto[], trip: TripOwner | null) {
+        await this.prismaService.member.createMany({
+            data: data.map(member => ({
+                email: member.email,
+                owner: member.owner,
+                status: member.owner,
+                tripId: trip.tripId,
+                name: member.owner ? trip.ownerName : null,
+            })),
         });
     }
 
-    async get(): Promise<MemberDto[]> {
-        const members = await this.prismaService.member.findMany({
-            select: {
-                email: true,
-                status: true,
+    async get(tripId: string): Promise<Member[]> {
+        return this.prismaService.member.findMany({
+            where: {
+                tripId: tripId,
             }
         });
-
-        const result: MemberDto[] = [];
-
-        for (const member of members) {
-            result.push({
-                email: member.email,
-                status: member.status
-            })
-        }
-
-        return result;
     }
 
-    getById(id: string): Promise<Member | null> {
+    getById(id: string, tripId: string): Promise<Member | null> {
         return this.prismaService.member.findUnique({
             where: {
                 id: id,
+                tripId: tripId,
             }
         });
     }
@@ -60,10 +54,11 @@ export class MemberRepository implements IMemberRepository {
         })
     }
 
-    async delete(id: string) {
+    async delete(id: string, tripId: string) {
         await this.prismaService.member.delete({
             where: {
-                id: id
+                id: id,
+                tripId: tripId
             }
         });
     }

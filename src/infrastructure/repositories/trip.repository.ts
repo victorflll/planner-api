@@ -7,6 +7,7 @@ import {Injectable} from "@nestjs/common";
 import {LocationModel, mapToCity} from "../../domain/models/trip/location.model";
 import {firstValueFrom} from "rxjs";
 import {HttpService} from "@nestjs/axios";
+import {TripOwner} from "../../domain/models/trip/trip.owner.model";
 
 @Injectable()
 export class TripRepository implements ITripRepository {
@@ -21,15 +22,23 @@ export class TripRepository implements ITripRepository {
         return mapToCity(response.data);
     }
 
-    async create(data: CreateTripDto) {
-        await this.prismaService.trip.create({
+    async create(data: CreateTripDto): Promise<TripOwner> {
+        const trip = await this.prismaService.trip.create({
             data: {
                 city: data.city,
                 country: data.country,
                 startDate: data.startDate,
                 endDate: data.endDate,
             },
+            select: {
+                id: true
+            }
         });
+
+        const result = new TripOwner(trip.id);
+        result.ownerName = data.ownerName;
+
+        return result;
     }
 
     async get(): Promise<Trip[]> {
