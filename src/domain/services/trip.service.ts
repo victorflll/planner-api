@@ -1,10 +1,10 @@
 import {Injectable} from '@nestjs/common';
-import {ITripService} from "../ports/interface.trip.service";
-import {CreateTripDto} from "../models/create.trip.dto";
+import {ITripService} from "../ports/trip/interface.trip.service";
+import {CreateTripDto} from "../models/trip/create.trip.dto";
 import {Trip} from "@prisma/client";
-import {UpdateTripDto} from "../models/update.trip.dto";
-import {ITripRepository} from "../ports/interface.trip.repository";
-import {LocationModel} from "../models/location.model";
+import {UpdateTripDto} from "../models/trip/update.trip.dto";
+import {ITripRepository} from "../ports/trip/interface.trip.repository";
+import {LocationModel} from "../models/trip/location.model";
 
 @Injectable()
 export class TripService implements ITripService {

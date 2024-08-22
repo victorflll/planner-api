@@ -1,8 +1,8 @@
 import {Body, Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
-import {ITripService} from "../../domain/ports/interface.trip.service";
+import {ITripService} from "../../domain/ports/trip/interface.trip.service";
 import {ApiTags} from "@nestjs/swagger";
-import {CreateTripDto} from "../../domain/models/create.trip.dto";
-import {UpdateTripDto} from "../../domain/models/update.trip.dto";
+import {CreateTripDto} from "../../domain/models/trip/create.trip.dto";
+import {UpdateTripDto} from "../../domain/models/trip/update.trip.dto";
 
 @ApiTags('Trip')
 @Controller('trips')
