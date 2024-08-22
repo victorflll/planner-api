@@ -1,7 +1,7 @@
 import {CreateTripDto} from "../models/create.trip.dto";
 import {Trip} from "@prisma/client";
 import {UpdateTripDto} from "../models/update.trip.dto";
-import {LocationModel} from "../models/locationModel";
+import {LocationModel} from "../models/location.model";
 
 export abstract class ITripRepository {
     abstract getCities(): Promise<LocationModel[]>;

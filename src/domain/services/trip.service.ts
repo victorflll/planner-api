@@ -4,7 +4,7 @@ import {CreateTripDto} from "../models/create.trip.dto";
 import {Trip} from "@prisma/client";
 import {UpdateTripDto} from "../models/update.trip.dto";
 import {ITripRepository} from "../ports/interface.trip.repository";
-import {LocationModel} from "../models/locationModel";
+import {LocationModel} from "../models/location.model";
 
 @Injectable()
 export class TripService implements ITripService {

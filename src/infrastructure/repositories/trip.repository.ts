@@ -4,7 +4,7 @@ import {Trip} from "@prisma/client";
 import {UpdateTripDto} from "../../domain/models/update.trip.dto";
 import {ITripRepository} from "../../domain/ports/interface.trip.repository";
 import {Injectable} from "@nestjs/common";
-import {LocationModel, mapToCity} from "../../domain/models/locationModel";
+import {LocationModel, mapToCity} from "../../domain/models/location.model";
 import {firstValueFrom} from "rxjs";
 import {HttpService} from "@nestjs/axios";
 
