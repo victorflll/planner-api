@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Trip {
+  id         String       @id @default(uuid())
+  city       String
+  country    String
+  startDate  DateTime     @map("start_date")
+  endDate    DateTime     @map("end_date")
+  Member     Member[]
+  Activities Activities[]
+  Attachment Attachment[]
+
+  @@map("trips")
+}
+
+model Member {
+  id     String  @id @default(uuid())
+  tripId String  @default(uuid()) @map("trip_id")
+  trip   Trip    @relation(fields: [tripId], references: [id])
+  name   String
+  email  String
+  owner  Boolean
+  status Boolean
+
+  @@map("members")
+}
+
+model Activities {
+  id     String   @id @default(uuid())
+  tripId String   @default(uuid()) @map("trip_id")
+  trip   Trip     @relation(fields: [tripId], references: [id])
+  title  String
+  date   DateTime
+  time   DateTime
+  status Boolean
+
+  @@map("activities")
+}
+
+model Attachment {
+  id     String @id @default(uuid())
+  tripId String @default(uuid()) @map("trip_id")
+  trip   Trip   @relation(fields: [tripId], references: [id])
+  title  String
+  link   String
+
+  @@map("attachments")
+}
