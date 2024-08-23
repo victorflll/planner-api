@@ -3,7 +3,6 @@ import {CreateMemberDto} from "src/domain/models/member/create.member.dto";
 import {IMemberRepository} from "../../domain/ports/member/interface.member.repository";
 import {PrismaService} from "../prisma.service";
 import {UpdateMemberDto} from "../../domain/models/member/update.member.dto";
-import {MemberDto} from "../../domain/models/member/member.dto";
 import {Injectable} from "@nestjs/common";
 import {TripOwner} from "../../domain/models/trip/trip.owner.model";
 
@@ -12,14 +11,25 @@ export class MemberRepository implements IMemberRepository {
     constructor(private readonly prismaService: PrismaService) {
     }
 
-    async create(data: CreateMemberDto[], trip: TripOwner | null) {
+    async createOwner(data: TripOwner, tripId: string) {
+        await this.prismaService.member.create({
+            data: {
+                name: data.name,
+                email: data.email,
+                owner: true,
+                status: true,
+                tripId: tripId,
+            }
+        });
+    }
+
+    async create(data: CreateMemberDto[], tripId: string) {
         await this.prismaService.member.createMany({
             data: data.map(member => ({
                 email: member.email,
                 owner: member.owner,
                 status: member.owner,
-                tripId: trip.tripId,
-                name: member.owner ? trip.ownerName : null,
+                tripId: tripId,
             })),
         });
     }

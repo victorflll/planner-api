@@ -7,7 +7,7 @@ import {TripOwner} from "../../models/trip/trip.owner.model";
 export abstract class ITripRepository {
     abstract getCities(): Promise<LocationModel[]>;
 
-    abstract create(data: CreateTripDto): Promise<TripOwner>;
+    abstract create(data: CreateTripDto): Promise<string>;
 
     abstract get(): Promise<Trip[]>;
 

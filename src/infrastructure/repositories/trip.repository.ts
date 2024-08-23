@@ -22,7 +22,7 @@ export class TripRepository implements ITripRepository {
         return mapToCity(response.data);
     }
 
-    async create(data: CreateTripDto): Promise<TripOwner> {
+    async create(data: CreateTripDto): Promise<string> {
         const trip = await this.prismaService.trip.create({
             data: {
                 city: data.city,
@@ -35,10 +35,7 @@ export class TripRepository implements ITripRepository {
             }
         });
 
-        const result = new TripOwner(trip.id);
-        result.ownerName = data.ownerName;
-
-        return result;
+        return trip.id;
     }
 
     async get(): Promise<Trip[]> {
@@ -80,6 +77,7 @@ export class TripRepository implements ITripRepository {
             where: {
                 id: trip.id,
             },
+
         });
     }
 }

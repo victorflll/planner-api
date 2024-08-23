@@ -1,5 +1,6 @@
 import {ApiProperty} from "@nestjs/swagger";
 import {CreateMemberDto} from "../member/create.member.dto";
+import {TripOwner} from "./trip.owner.model";
 
 export class CreateTripDto {
     @ApiProperty({example: 'Florianópolis'})
@@ -10,8 +11,8 @@ export class CreateTripDto {
     startDate: string;
     @ApiProperty({example: '2024-08-23 00:00:00.000Z'})
     endDate: string;
-    @ApiProperty({example: 'João da Silva'})
-    ownerName: string;
+    @ApiProperty({ type: TripOwner })
+    owner: TripOwner
     @ApiProperty({ type: [CreateMemberDto] })
     members: CreateMemberDto[]
 }

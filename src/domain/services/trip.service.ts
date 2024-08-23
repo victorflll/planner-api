@@ -7,6 +7,7 @@ import {ITripRepository} from "../ports/trip/interface.trip.repository";
 import {LocationModel} from "../models/trip/location.model";
 import {IMemberService} from "../ports/member/interface.member.service";
 import {IMemberRepository} from "../ports/member/interface.member.repository";
+import {CreateMemberDto} from "../models/member/create.member.dto";
 
 @Injectable()
 export class TripService implements ITripService {
@@ -21,6 +22,7 @@ export class TripService implements ITripService {
     async create(data: CreateTripDto) {
         const tripId = await this.tripRepository.create(data);
 
+        this.memberRepository.createOwner(data.owner, tripId);
         this.memberRepository.create(data.members, tripId);
     }
 

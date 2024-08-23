@@ -12,8 +12,8 @@ export class MemberService implements IMemberService {
     constructor(private readonly memberRepository: IMemberRepository) {
     }
 
-    create(data: CreateMemberDto[], trip: TripOwner | null): void {
-        return this.memberRepository.create(data, trip);
+    create(data: CreateMemberDto[], tripId: string): void {
+        return this.memberRepository.create(data, tripId);
     }
 
     async get(tripId: string): Promise<MemberDto[]> {
@@ -24,7 +24,8 @@ export class MemberService implements IMemberService {
         for (const member of members) {
             result.push({
                 email: member.email,
-                status: member.status
+                status: member.status,
+                owner: member.owner
             })
         }
 

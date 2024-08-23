@@ -1,8 +1,8 @@
-export class TripOwner {
-    tripId: string;
-    ownerName: string | null = null;
+import {ApiProperty} from "@nestjs/swagger";
 
-    constructor(tripId: string) {
-        this.tripId = tripId;
-    }
+export class TripOwner {
+    @ApiProperty({example: 'Maria de Souza'})
+    name: string;
+    @ApiProperty({example: 'maria@email.com'})
+    email: string;
 }

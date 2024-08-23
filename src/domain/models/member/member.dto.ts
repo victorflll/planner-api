@@ -5,4 +5,6 @@ export class MemberDto {
     email: string;
     @ApiProperty({ example: false })
     status: boolean;
+    @ApiProperty({ example: false })
+    owner: boolean;
 }

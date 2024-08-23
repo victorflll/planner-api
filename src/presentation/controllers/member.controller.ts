@@ -20,7 +20,7 @@ export class MemberController {
     @Post('/')
     @ApiBody({type: [CreateMemberDto]})
     create(@Body() data: CreateMemberDto[], @Query() params: MemberQueryParams) {
-        this.memberService.create(data, new TripOwner(params.tripId));
+        this.memberService.create(data, params.tripId);
     }
 
     @Get('/:id')
