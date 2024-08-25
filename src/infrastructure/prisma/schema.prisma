@@ -44,7 +44,6 @@ model Activities {
   trip   Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   title  String
   date   DateTime
-  time   DateTime
   status Boolean
 
   @@map("activities")
