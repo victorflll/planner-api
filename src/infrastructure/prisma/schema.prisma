@@ -29,8 +29,8 @@ model Trip {
 model Member {
   id     String  @id @default(uuid())
   tripId String  @default(uuid()) @map("trip_id")
-  trip   Trip    @relation(fields: [tripId], references: [id])
-  name   String
+  trip   Trip    @relation(fields: [tripId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  name   String?
   email  String
   owner  Boolean
   status Boolean
@@ -41,7 +41,7 @@ model Member {
 model Activities {
   id     String   @id @default(uuid())
   tripId String   @default(uuid()) @map("trip_id")
-  trip   Trip     @relation(fields: [tripId], references: [id])
+  trip   Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   title  String
   date   DateTime
   time   DateTime
@@ -53,7 +53,7 @@ model Activities {
 model Attachment {
   id     String @id @default(uuid())
   tripId String @default(uuid()) @map("trip_id")
-  trip   Trip   @relation(fields: [tripId], references: [id])
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   title  String
   link   String
 

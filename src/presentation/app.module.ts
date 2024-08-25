@@ -3,17 +3,20 @@ import {TripController} from './controllers/trip.controller';
 import {TripService} from '../domain/services/trip.service';
 import {PrismaService} from "../infrastructure/prisma.service";
 import {TripRepository} from "../infrastructure/repositories/trip.repository";
-import {ITripRepository} from "../domain/ports/interface.trip.repository";
-import {ITripService} from "../domain/ports/interface.trip.service";
+import {ITripRepository} from "../domain/ports/trip/interface.trip.repository";
+import {ITripService} from "../domain/ports/trip/interface.trip.service";
 import { HttpModule } from '@nestjs/axios';
+import {IMemberRepository} from "../domain/ports/member/interface.member.repository";
+import {MemberRepository} from "../infrastructure/repositories/member.repository";
+import {IMemberService} from "../domain/ports/member/interface.member.service";
+import {MemberService} from "../domain/services/member.service";
+import {MemberController} from "./controllers/member.controller";
 
 @Module({
     imports: [HttpModule],
-    controllers: [TripController],
+    controllers: [TripController, MemberController],
     providers: [
         PrismaService,
-        TripRepository,
-        TripService,
         {
             provide: ITripRepository,
             useClass: TripRepository
@@ -21,6 +24,14 @@ import { HttpModule } from '@nestjs/axios';
         {
             provide: ITripService,
             useClass: TripService
+        },
+        {
+            provide: IMemberRepository,
+            useClass: MemberRepository
+        },
+        {
+            provide: IMemberService,
+            useClass: MemberService
         }
     ],
 })

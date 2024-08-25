@@ -1,12 +1,13 @@
 import {PrismaService} from "../prisma.service";
-import {CreateTripDto} from "../../domain/models/create.trip.dto";
+import {CreateTripDto} from "../../domain/models/trip/create.trip.dto";
 import {Trip} from "@prisma/client";
-import {UpdateTripDto} from "../../domain/models/update.trip.dto";
-import {ITripRepository} from "../../domain/ports/interface.trip.repository";
+import {UpdateTripDto} from "../../domain/models/trip/update.trip.dto";
+import {ITripRepository} from "../../domain/ports/trip/interface.trip.repository";
 import {Injectable} from "@nestjs/common";
-import {LocationModel, mapToCity} from "../../domain/models/location.model";
+import {LocationModel, mapToCity} from "../../domain/models/trip/location.model";
 import {firstValueFrom} from "rxjs";
 import {HttpService} from "@nestjs/axios";
+import {TripOwner} from "../../domain/models/trip/trip.owner.model";
 
 @Injectable()
 export class TripRepository implements ITripRepository {
@@ -21,15 +22,20 @@ export class TripRepository implements ITripRepository {
         return mapToCity(response.data);
     }
 
-    async create(data: CreateTripDto) {
-        await this.prismaService.trip.create({
+    async create(data: CreateTripDto): Promise<string> {
+        const trip = await this.prismaService.trip.create({
             data: {
                 city: data.city,
                 country: data.country,
                 startDate: data.startDate,
                 endDate: data.endDate,
             },
+            select: {
+                id: true
+            }
         });
+
+        return trip.id;
     }
 
     async get(): Promise<Trip[]> {
@@ -71,6 +77,7 @@ export class TripRepository implements ITripRepository {
             where: {
                 id: trip.id,
             },
+
         });
     }
 }
