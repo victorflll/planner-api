@@ -22,6 +22,10 @@ import {HandlebarsAdapter} from "@nestjs-modules/mailer/dist/adapters/handlebars
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import {IMailService} from "../domain/ports/email/interface.mail.service";
 import {MailService} from "../domain/services/mail.service";
+import { IAttachmentRepository } from 'src/domain/ports/attachment/interface.attachment.repository';
+import { AttachmentRepository } from 'src/infrastructure/repositories/attachment.repository';
+import { IAttachmentService } from 'src/domain/ports/attachment/interface.attachment.service';
+import { AttachmentService } from 'src/domain/services/attachment.service';
 
 @Module({
     imports: [MailerModule.forRootAsync({
@@ -80,6 +84,14 @@ import {MailService} from "../domain/services/mail.service";
         {
             provide: IMailService,
             useClass: MailService
+        },
+        {
+            provide: IAttachmentRepository,
+            useClass: AttachmentRepository
+        },
+        {
+            provide: IAttachmentService,
+            useClass: AttachmentService
         }
     ],
     exports: [IMailService],
