@@ -22,10 +22,13 @@ export class ActivityRepository implements IActivityRepository {
 
     async get(tripId: string): Promise<Activities[]> {
         return this.prismaService.activities.findMany({
-            where: { tripId: tripId }
+            where: { tripId: tripId },
+            orderBy: {
+                date: 'asc', 
+            },
         });
     }
-
+    
     async getById(id: string, tripId: string): Promise<Activities | null> {
         return this.prismaService.activities.findUnique({
             where: { id: id, tripId: tripId }

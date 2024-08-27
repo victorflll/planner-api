@@ -16,10 +16,15 @@ import { ActivityService } from '../domain/services/activity.service';
 import { IActivityRepository } from '../domain/ports/activity/interface.activity.repository'; 
 import { IActivityService } from 'src/domain/ports/activity/interface.activity.service';
 import { ActivityRepository } from '../infrastructure/repositories/activity.repository'; 
+import { IAttachmentRepository } from 'src/domain/ports/attachment/interface.attachment.repository';
+import { AttachmentRepository } from 'src/infrastructure/repositories/attachment.repository';
+import { IAttachmentService } from 'src/domain/ports/attachment/interface.attachment.service';
+import { AttachmentService } from 'src/domain/services/attachment.service';
+import { AttachmentController } from './controllers/attachment.controller';
 
 @Module({
   imports: [HttpModule],
-  controllers: [TripController, MemberController, ActivityController],
+  controllers: [TripController, MemberController, ActivityController, AttachmentController],
   providers: [
     PrismaService,
     {
@@ -45,6 +50,14 @@ import { ActivityRepository } from '../infrastructure/repositories/activity.repo
     {
       provide: IActivityService,
       useClass: ActivityService
+    },
+    {
+      provide: IAttachmentRepository,
+      useClass: AttachmentRepository
+    },
+    {
+      provide: IAttachmentService,
+      useClass: AttachmentService
     }
   ],
 })
