@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/common';
 import {ITripService} from "../../domain/ports/trip/interface.trip.service";
 import {ApiTags} from "@nestjs/swagger";
 import {CreateTripDto} from "../../domain/models/trip/create.trip.dto";
@@ -21,8 +21,8 @@ export class TripController {
     }
 
     @Get('/cities')
-    async getCities() {
-        return await this.tripService.getCities();
+    async getCities(@Query('startsWith') startsWith: string) {
+        return await this.tripService.getCities(startsWith);
     }
 
     @Get('/:id')

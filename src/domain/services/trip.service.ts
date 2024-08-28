@@ -13,8 +13,8 @@ export class TripService implements ITripService {
     constructor(private memberService: IMemberService, private tripRepository: ITripRepository, private memberRepository: IMemberRepository) {
     }
 
-    getCities(): Promise<LocationModel[]> {
-        return this.tripRepository.getCities();
+    getCities(startsWith: string): Promise<LocationModel[]> {
+        return this.tripRepository.getCities(startsWith);
     }
 
 

@@ -3,6 +3,7 @@ import Any = jasmine.Any;
 export interface LocationModel {
     city: string;
     acronym: string;
+    country: string;
 }
 
 export function mapToCity(locationData: Any[]): LocationModel[] {
@@ -12,6 +13,7 @@ export function mapToCity(locationData: Any[]): LocationModel[] {
         result.push({
             city: location['municipio-nome'],
             acronym: location['UF-sigla'],
+            country: "BR",
         });
     }
 
