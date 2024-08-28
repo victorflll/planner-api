@@ -9,7 +9,7 @@ import { Attachment } from "@prisma/client";
 export class AttachmentService implements IAttachmentService {
     constructor(private readonly attachmentRepository: IAttachmentRepository) {}
 
-    async create(data: CreateAttachmentDto, tripId: string): Promise<void> {
+    async create(data: CreateAttachmentDto[], tripId: string): Promise<void> {
         await this.attachmentRepository.create(data, tripId);
     }
 
