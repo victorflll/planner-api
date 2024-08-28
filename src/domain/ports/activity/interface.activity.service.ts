@@ -1,12 +1,13 @@
 import { Activities } from "@prisma/client";
 import { CreateActivityDto } from "src/domain/models/activity/create.activity.dto";
 import { UpdateActivityDto } from "src/domain/models/activity/update.activity.dto";
+import {ActivityGroupDto} from "../../models/activity/activity.group.dto";
 
 export abstract class IActivityService {
     
     abstract create(data: CreateActivityDto[], tripId: string): Promise<void>;
 
-    abstract get(tripId: string): Promise<Activities[]>;
+    abstract get(tripId: string): Promise<ActivityGroupDto[]>;
 
     abstract getById(id: string, tripId: string): Promise<Activities | null>;
 

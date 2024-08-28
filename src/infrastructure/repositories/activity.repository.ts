@@ -4,6 +4,8 @@ import { Activities } from "@prisma/client";
 import { UpdateActivityDto } from "../../domain/models/activity/update.activity.dto";
 import { IActivityRepository } from "../../domain/ports/activity/interface.activity.repository";
 import { Injectable } from "@nestjs/common";
+import {ActivityGroupDto} from "../../domain/models/activity/activity.group.dto";
+import {ActivityDto} from "../../domain/models/activity/activity.dto";
 
 @Injectable()
 export class ActivityRepository implements IActivityRepository {
@@ -20,13 +22,45 @@ export class ActivityRepository implements IActivityRepository {
         });
     }
 
-    async get(tripId: string): Promise<Activities[]> {
-        return this.prismaService.activities.findMany({
+    async get(tripId: string): Promise<ActivityGroupDto[]> {
+        const query = await this.prismaService.activities.findMany({
             where: { tripId: tripId },
             orderBy: {
                 date: 'asc', 
             },
         });
+
+        const formatDate = (date: string) => {
+            return date.split('T')[0];
+        };
+
+        const groupedActivities = query.reduce((groups, activity) => {
+            const dateDay = formatDate(activity.date.toISOString());
+            if (!groups[dateDay]) {
+                groups[dateDay] = [];
+            }
+            groups[dateDay].push({
+                id: activity.id,
+                tripId: activity.tripId,
+                title: activity.title,
+                date: activity.date.toISOString(),
+                status: activity.status,
+            });
+            return groups;
+        }, {} as Record<string, ActivityDto[]>);
+
+        const result: ActivityGroupDto[] = Object.keys(groupedActivities).map(dateDay => ({
+            dateDay,
+            activities: groupedActivities[dateDay].map(activity => ({
+                id: activity.id,
+                tripId: activity.tripId,
+                title: activity.title,
+                date: activity.date,
+                status: activity.status
+            })),
+        }));
+
+        return result;
     }
     
     async getById(id: string, tripId: string): Promise<Activities | null> {

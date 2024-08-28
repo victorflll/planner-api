@@ -22,10 +22,11 @@ import {HandlebarsAdapter} from "@nestjs-modules/mailer/dist/adapters/handlebars
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import {IMailService} from "../domain/ports/email/interface.mail.service";
 import {MailService} from "../domain/services/mail.service";
-import { IAttachmentRepository } from 'src/domain/ports/attachment/interface.attachment.repository';
-import { AttachmentRepository } from 'src/infrastructure/repositories/attachment.repository';
-import { IAttachmentService } from 'src/domain/ports/attachment/interface.attachment.service';
-import { AttachmentService } from 'src/domain/services/attachment.service';
+import {IAttachmentRepository} from 'src/domain/ports/attachment/interface.attachment.repository';
+import {AttachmentRepository} from 'src/infrastructure/repositories/attachment.repository';
+import {IAttachmentService} from 'src/domain/ports/attachment/interface.attachment.service';
+import {AttachmentService} from 'src/domain/services/attachment.service';
+import {AttachmentController} from "./controllers/attachment.controller";
 
 @Module({
     imports: [MailerModule.forRootAsync({
@@ -54,7 +55,7 @@ import { AttachmentService } from 'src/domain/services/attachment.service';
         inject: [ConfigService],
         imports: [ConfigModule]
     }), HttpModule],
-    controllers: [TripController, MemberController, ActivityController],
+    controllers: [TripController, MemberController, ActivityController, AttachmentController],
     providers: [
         PrismaService,
         {
