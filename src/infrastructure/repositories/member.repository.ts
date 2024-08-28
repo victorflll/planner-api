@@ -51,6 +51,15 @@ export class MemberRepository implements IMemberRepository {
         });
     }
 
+    getByEmail(email: string, tripId: string): Promise<Member | null> {
+        return this.prismaService.member.findFirst({
+            where: {
+                email: email,
+                tripId: tripId,
+            }
+        });
+    }
+
     async confirm(id: string, tripId: string, dto: UpdateMemberDto) {
         await this.prismaService.member.update({
             where: {

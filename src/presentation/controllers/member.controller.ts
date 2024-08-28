@@ -28,6 +28,11 @@ export class MemberController {
         return await this.memberService.getById(id, params.tripId);
     }
 
+    @Get('/:email')
+    async getByEmail(@Param('email') email: string, @Query() params: MemberQueryParams) {
+        return await this.memberService.getByEmail(email, params.tripId);
+    }
+
     @Patch('confirm/:id')
     update(
         @Body() data: UpdateMemberDto,
