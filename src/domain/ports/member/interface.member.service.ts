@@ -10,6 +10,8 @@ export abstract class IMemberService {
 
     abstract getById(id: string, tripId: string): Promise<Member | null>;
 
+    abstract getByEmail(email: string, tripId: string): Promise<Member | null>;
+
     abstract confirm(id: string, tripId: string, dto: UpdateMemberDto): void;
 
     abstract delete(id: string, tripId: string): void;

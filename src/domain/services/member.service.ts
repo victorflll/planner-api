@@ -5,14 +5,25 @@ import {UpdateMemberDto} from "../models/member/update.member.dto";
 import {IMemberService} from "../ports/member/interface.member.service";
 import {IMemberRepository} from "../ports/member/interface.member.repository";
 import {Injectable} from "@nestjs/common";
-import {TripOwner} from "../models/trip/trip.owner.model";
+import {IMailService} from "../ports/email/interface.mail.service";
+import {ITripRepository} from "../ports/trip/interface.trip.repository";
+import {mailTemplate} from "../../presentation/templates/mail.template";
 
 @Injectable()
 export class MemberService implements IMemberService {
-    constructor(private readonly memberRepository: IMemberRepository) {
+    constructor(private readonly memberRepository: IMemberRepository, private readonly mailService: IMailService, private tripRepository: ITripRepository) {
     }
 
-    create(data: CreateMemberDto[], tripId: string): void {
+    async create(data: CreateMemberDto[], tripId: string) {
+        const trip = await this.tripRepository.getById(tripId);
+
+        if (trip != null) {
+            for (const member of data) {
+                const template = mailTemplate(member.email, trip);
+                this.mailService.sendMail(member.email, "Convite para Viagem!", template);
+            }
+        }
+
         return this.memberRepository.create(data, tripId);
     }
 
@@ -34,6 +45,10 @@ export class MemberService implements IMemberService {
 
     getById(id: string, tripId: string): Promise<Member | null> {
         return this.memberRepository.getById(id, tripId);
+    }
+
+    getByEmail(email: string, tripId: string): Promise<Member | null> {
+        return this.memberRepository.getByEmail(email, tripId);
     }
 
     confirm(id: string, tripId: string, dto: UpdateMemberDto): void {
