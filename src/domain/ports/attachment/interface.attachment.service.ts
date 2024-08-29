@@ -4,7 +4,7 @@ import { UpdateAttachmentDto } from "src/domain/models/attachment/update.attachm
 
 export abstract class IAttachmentService {
     
-    abstract create(data: CreateAttachmentDto, tripId: string): void;
+    abstract create(data: CreateAttachmentDto[], tripId: string): void;
 
     abstract get(tripId: string): Promise<Attachment[]>;
 

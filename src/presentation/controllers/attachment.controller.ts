@@ -11,8 +11,8 @@ export class AttachmentController {
     constructor(private readonly attachmentService: IAttachmentService) {}
 
     @Post('/')
-    @ApiBody({ type: CreateAttachmentDto })
-    create(@Body() data: CreateAttachmentDto, @Query('tripId') tripId: string): void {
+    @ApiBody({ type: [CreateAttachmentDto] })
+    create(@Body() data: CreateAttachmentDto[], @Query('tripId') tripId: string): void {
         this.attachmentService.create(data, tripId);
     }
 
