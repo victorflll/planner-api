@@ -7,19 +7,22 @@ import {Injectable} from "@nestjs/common";
 import {LocationModel, mapToCity} from "../../domain/models/trip/location.model";
 import {firstValueFrom} from "rxjs";
 import {HttpService} from "@nestjs/axios";
-import {TripOwner} from "../../domain/models/trip/trip.owner.model";
 
 @Injectable()
 export class TripRepository implements ITripRepository {
     constructor(private readonly prismaService: PrismaService, private readonly httpService: HttpService) {
     }
 
-    async getCities(): Promise<LocationModel[]> {
+    async getCities(startsWith: string): Promise<LocationModel[]> {
         const url = 'https://servicodados.ibge.gov.br/api/v1/localidades/municipios?view=nivelado&orderBy=nome';
 
         const response = await firstValueFrom(this.httpService.get(url));
 
-        return mapToCity(response.data);
+        const locations = mapToCity(response.data);
+
+        const result = locations.filter(item => item.city.toLowerCase().startsWith(startsWith.toLowerCase()));
+
+        return result;
     }
 
     async create(data: CreateTripDto): Promise<string> {
@@ -47,6 +50,11 @@ export class TripRepository implements ITripRepository {
             where: {
                 id: id,
             },
+            include: {
+                Member: true,
+                Activities: true,
+                Attachment: true,
+            }
         });
 
         if (!trip) {

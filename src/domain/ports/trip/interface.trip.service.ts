@@ -4,7 +4,7 @@ import {UpdateTripDto} from "../../models/trip/update.trip.dto";
 import {LocationModel} from "../../models/trip/location.model";
 
 export abstract class ITripService {
-    abstract getCities(): Promise<LocationModel[]>;
+    abstract getCities(startsWith: string): Promise<LocationModel[]>;
 
     abstract create(data: CreateTripDto): void;
 
