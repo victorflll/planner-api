@@ -4,6 +4,7 @@ import { IActivityRepository } from '../ports/activity/interface.activity.reposi
 import { CreateActivityDto } from '../models/activity/create.activity.dto';
 import { UpdateActivityDto } from '../models/activity/update.activity.dto';
 import { Activities } from '@prisma/client';
+import {ActivityGroupDto} from "../models/activity/activity.group.dto";
 
 @Injectable()
 export class ActivityService implements IActivityService {
@@ -13,7 +14,7 @@ export class ActivityService implements IActivityService {
         await this.activityRepository.create(data, tripId);
     }
 
-    async get(tripId: string): Promise<Activities[]> {
+    async get(tripId: string): Promise<ActivityGroupDto[]> {
         return this.activityRepository.get(tripId); 
     }
 

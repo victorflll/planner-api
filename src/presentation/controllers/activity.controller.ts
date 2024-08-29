@@ -1,9 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
-import { ApiBody, ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { IActivityService } from "../../domain/ports/activity/interface.activity.service";
 import { CreateActivityDto } from "../../domain/models/activity/create.activity.dto";
 import { UpdateActivityDto } from "../../domain/models/activity/update.activity.dto";
 import { Activities } from '@prisma/client';
+import {ActivityGroupDto} from "../../domain/models/activity/activity.group.dto";
 
 @ApiTags('Activity')
 @Controller('activities')
@@ -17,7 +18,7 @@ export class ActivityController {
     }
 
     @Get('/')
-    async get(@Query('tripId') tripId: string): Promise<Activities[]> {
+    async get(@Query('tripId') tripId: string): Promise<ActivityGroupDto[]> {
         return await this.activityService.get(tripId);
     }
 
