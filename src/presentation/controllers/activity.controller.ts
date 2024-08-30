@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Patch, Post, Query, UseFilters} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseFilters} from '@nestjs/common';
 import {ApiBody, ApiTags} from "@nestjs/swagger";
 import {IActivityService} from "../../domain/ports/activity/interface.activity.service";
 import {CreateActivityDto} from "../../domain/models/activity/create.activity.dto";
@@ -30,7 +30,7 @@ export class ActivityController {
         return await this.activityService.getById(id, tripId);
     }
 
-    @Patch('/:id')
+    @Put('/:id')
     async update(
         @Body() data: UpdateActivityDto,
         @Param('id') id: string,

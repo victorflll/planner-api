@@ -35,6 +35,7 @@ export class MemberService implements IMemberService {
         for (const member of members) {
             result.push({
                 email: member.email,
+                name: member.name,
                 status: member.status,
                 owner: member.owner
             })

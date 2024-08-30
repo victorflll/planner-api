@@ -45,7 +45,10 @@ export class AttachmentRepository implements IAttachmentRepository {
         const trip = await this.tripRepository.getById(tripId);
 
         const result = await this.prismaService.attachment.findUnique({
-            where: {id: id, tripId: trip.id},
+            where: {
+                id: id,
+                tripId: trip.id
+            },
         });
 
         if (!result) {
@@ -58,14 +61,15 @@ export class AttachmentRepository implements IAttachmentRepository {
     async update(id: string, tripId: string, data: UpdateAttachmentDto): Promise<Attachment> {
         const trip = await this.tripRepository.getById(tripId);
 
+        const attachment = await this.getById(id, tripId);
+
         const result = await this.prismaService.attachment.update({
-            where: {id: id, tripId: trip.id},
+            where: {
+                id: attachment.id,
+                tripId: trip.id
+            },
             data: data,
         });
-
-        if (!result) {
-            throw new NotFoundException('Attachment cannot be updated because there is no attachment or trip with the ids.');
-        }
 
         return result;
     }
@@ -73,12 +77,13 @@ export class AttachmentRepository implements IAttachmentRepository {
     async delete(id: string, tripId: string): Promise<void> {
         const trip = await this.tripRepository.getById(tripId);
 
-        const result = await this.prismaService.attachment.delete({
-            where: {id: id, tripId: trip.id},
-        });
+        const attachment = await this.getById(id, tripId);
 
-        if (!result) {
-            throw new NotFoundException('Attachment cannot be deleted because there is no attachment with the id.');
-        }
+        await this.prismaService.attachment.delete({
+            where: {
+                id: attachment.id,
+                tripId: trip.id
+            },
+        });
     }
 }

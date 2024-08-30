@@ -24,14 +24,14 @@ export class MemberController {
         return this.memberService.create(data, params.tripId);
     }
 
+    @Get('/email')
+    async getByEmail(@Query('email') email: string, @Query() params: MemberQueryParams) {
+        return await this.memberService.getByEmail(email, params.tripId);
+    }
+
     @Get('/:id')
     async getById(@Param('id') id: string, @Query() params: MemberQueryParams) {
         return await this.memberService.getById(id, params.tripId);
-    }
-
-    @Get('/:email')
-    async getByEmail(@Param('email') email: string, @Query() params: MemberQueryParams) {
-        return await this.memberService.getByEmail(email, params.tripId);
     }
 
     @Patch('confirm/:id')

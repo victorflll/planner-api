@@ -94,15 +94,18 @@ export class ActivityRepository implements IActivityRepository {
     }
 
     async getById(id: string, tripId: string): Promise<Activities> {
-        const result = this.prismaService.activities.findUnique({
-            where: {id: id, tripId: tripId}
+        const result = await this.prismaService.activities.findUnique({
+            where: {
+                id: id,
+                tripId: tripId
+            }
         });
 
         if (!result) {
             throw new NotFoundException('Activity not found in this trip.');
         }
 
-        return
+        return result;
     }
 
     async update(id: string, tripId: string, data: UpdateActivityDto): Promise<void> {
@@ -113,9 +116,14 @@ export class ActivityRepository implements IActivityRepository {
             throw new BadRequestException(`Activity date ${data.date} is outside the trip dates.`);
         }
 
+        const activity = await this.getById(id, tripId);
+
         try {
             await this.prismaService.activities.update({
-                where: {id: id, tripId: tripId},
+                where: {
+                    id: activity.id,
+                    tripId: tripId
+                },
                 data: {
                     title: data.title,
                     date: activityDate,
@@ -133,25 +141,29 @@ export class ActivityRepository implements IActivityRepository {
     async confirm(id: string, tripId: string): Promise<void> {
         const trip = await this.tripRepository.getById(tripId);
 
-        const result = await this.prismaService.activities.update({
-            where: {id: id, tripId: trip.id},
-            data: {status: true},
-        });
+        const activity = await this.getById(id, tripId);
 
-        if (!result) {
-            throw new NotFoundException('Activity cannot be confirmed because there is no activity with the id.');
-        }
+        await this.prismaService.activities.update({
+            where: {
+                id: activity.id,
+                tripId: trip.id
+            },
+            data: {
+                status: true
+            },
+        });
     }
 
     async delete(id: string, tripId: string): Promise<void> {
         const trip = await this.tripRepository.getById(tripId);
 
-        const result = await this.prismaService.activities.delete({
-            where: {id: id, tripId: trip.id}
-        });
+        const activity = await this.getById(id, tripId);
 
-        if (!result) {
-            throw new NotFoundException('Activity cannot be deleted because there is no activity with the id.');
-        }
+        await this.prismaService.activities.delete({
+            where: {
+                id: activity.id,
+                tripId: trip.id
+            }
+        });
     }
 }

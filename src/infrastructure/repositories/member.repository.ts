@@ -58,7 +58,10 @@ export class MemberRepository implements IMemberRepository {
     async getById(id: string, tripId: string): Promise<Member> {
         const trip = await this.tripRepository.getById(tripId);
 
-        const result = this.prismaService.member.findUnique({
+        console.log(id);
+        console.log(tripId);
+
+        const result = await this.prismaService.member.findUnique({
             where: {
                 id: id,
                 tripId: trip.id,
@@ -75,7 +78,7 @@ export class MemberRepository implements IMemberRepository {
     async getByEmail(email: string, tripId: string): Promise<Member> {
         const trip = await this.tripRepository.getById(tripId);
 
-        const result = this.prismaService.member.findFirst({
+        const result = await this.prismaService.member.findFirst({
             where: {
                 email: email,
                 tripId: trip.id,
@@ -90,32 +93,32 @@ export class MemberRepository implements IMemberRepository {
     }
 
     async confirm(id: string, tripId: string, dto: UpdateMemberDto) {
-        const result = await this.prismaService.member.update({
+        const trip = await this.tripRepository.getById(tripId);
+
+        const member = await this.getById(id, tripId);
+
+        await this.prismaService.member.update({
             where: {
-                id: id,
-                tripId: tripId,
+                id: member.id,
+                tripId: trip.id,
             },
             data: {
                 name: dto.name,
                 status: true
             }
-        })
-
-        if (!result) {
-            throw new NotFoundException('Member cannot be confirmed because there is no member with the id.');
-        }
+        });
     }
 
     async delete(id: string, tripId: string) {
-        const result = await this.prismaService.member.delete({
+        const trip = await this.tripRepository.getById(tripId);
+
+        const member = await this.getById(id, tripId);
+
+        await this.prismaService.member.delete({
             where: {
-                id: id,
-                tripId: tripId
+                id: member.id,
+                tripId: trip.id
             }
         });
-
-        if (!result) {
-            throw new NotFoundException('Member cannot be deleted because there is no member with the id.');
-        }
     }
 }

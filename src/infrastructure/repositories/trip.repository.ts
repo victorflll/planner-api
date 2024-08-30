@@ -56,7 +56,6 @@ export class TripRepository implements ITripRepository {
             },
             include: {
                 members: true,
-                activities: true,
                 attachments: true,
             }
         });
