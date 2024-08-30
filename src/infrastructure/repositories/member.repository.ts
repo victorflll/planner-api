@@ -27,8 +27,8 @@ export class MemberRepository implements IMemberRepository {
         await this.prismaService.member.createMany({
             data: data.map(member => ({
                 email: member.email,
-                owner: member.owner,
-                status: member.owner,
+                owner: false,
+                status: false,
                 tripId: tripId,
             })),
         });
