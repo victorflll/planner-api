@@ -18,7 +18,7 @@ export class ActivityService implements IActivityService {
         return this.activityRepository.get(tripId); 
     }
 
-    async getById(id: string, tripId: string): Promise<Activities | null> {
+    async getById(id: string, tripId: string): Promise<Activities> {
         return this.activityRepository.getById(id, tripId); 
     }
 

@@ -33,7 +33,7 @@ export class TripService implements ITripService {
         return this.tripRepository.get();
     }
 
-    getById(id: string): Promise<Trip | null> {
+    getById(id: string): Promise<Trip> {
         return this.tripRepository.getById(id);
     }
 

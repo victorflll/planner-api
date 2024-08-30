@@ -1,19 +1,21 @@
-import { Controller, Get, Post, Delete, Put, Param, Body, Query } from "@nestjs/common";
-import { ApiTags, ApiBody, ApiParam } from "@nestjs/swagger";
+import {Controller, Get, Post, Delete, Put, Param, Body, Query, UseFilters} from "@nestjs/common";
+import { ApiTags, ApiBody } from "@nestjs/swagger";
 import { IAttachmentService } from "../../domain/ports/attachment/interface.attachment.service";
 import { CreateAttachmentDto } from "../../domain/models/attachment/create.attachment.dto";
 import { UpdateAttachmentDto } from "../../domain/models/attachment/update.attachment.dto";
 import { Attachment } from "@prisma/client";
+import {HttpExceptionMiddleware} from "../../infrastructure/middlewares/HttpExceptionMiddleware";
 
 @ApiTags('Attachment')
 @Controller('attachments')
+@UseFilters(HttpExceptionMiddleware)
 export class AttachmentController {
     constructor(private readonly attachmentService: IAttachmentService) {}
 
     @Post('/')
     @ApiBody({ type: [CreateAttachmentDto] })
     create(@Body() data: CreateAttachmentDto[], @Query('tripId') tripId: string): void {
-        this.attachmentService.create(data, tripId);
+        return this.attachmentService.create(data, tripId);
     }
 
     @Get('/')

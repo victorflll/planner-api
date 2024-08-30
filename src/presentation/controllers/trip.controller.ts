@@ -1,18 +1,20 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, Query, UseFilters} from '@nestjs/common';
 import {ITripService} from "../../domain/ports/trip/interface.trip.service";
 import {ApiTags} from "@nestjs/swagger";
 import {CreateTripDto} from "../../domain/models/trip/create.trip.dto";
 import {UpdateTripDto} from "../../domain/models/trip/update.trip.dto";
+import {HttpExceptionMiddleware} from "../../infrastructure/middlewares/HttpExceptionMiddleware";
 
 @ApiTags('Trip')
 @Controller('trips')
+@UseFilters(HttpExceptionMiddleware)
 export class TripController {
     constructor(private readonly tripService: ITripService) {
     }
 
     @Post('/')
     create(@Body() data: CreateTripDto) {
-        this.tripService.create(data);
+        return this.tripService.create(data);
     }
 
     @Get('/')
@@ -35,7 +37,7 @@ export class TripController {
         @Body() data: UpdateTripDto,
         @Param('id') id: string,
     ) {
-        this.tripService.update(id, data);
+        return this.tripService.update(id, data);
     }
 
     @Delete('/:id')

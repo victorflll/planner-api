@@ -22,9 +22,9 @@ export class MemberService implements IMemberService {
                 const template = mailTemplate(member.email, trip);
                 this.mailService.sendMail(member.email, "Convite para Viagem!", template);
             }
-        }
 
-        return this.memberRepository.create(data, tripId);
+            return this.memberRepository.create(data, tripId);
+        }
     }
 
     async get(tripId: string): Promise<MemberDto[]> {
@@ -43,11 +43,11 @@ export class MemberService implements IMemberService {
         return result;
     }
 
-    getById(id: string, tripId: string): Promise<Member | null> {
+    getById(id: string, tripId: string): Promise<Member> {
         return this.memberRepository.getById(id, tripId);
     }
 
-    getByEmail(email: string, tripId: string): Promise<Member | null> {
+    getByEmail(email: string, tripId: string): Promise<Member> {
         return this.memberRepository.getByEmail(email, tripId);
     }
 

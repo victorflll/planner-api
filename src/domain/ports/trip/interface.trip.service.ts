@@ -10,7 +10,7 @@ export abstract class ITripService {
 
     abstract get(): Promise<Trip[]>;
 
-    abstract getById(id: string): Promise<Trip | null>;
+    abstract getById(id: string): Promise<Trip>;
 
     abstract update(id: string, data: UpdateTripDto): void;
 

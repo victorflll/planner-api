@@ -27,6 +27,8 @@ import {AttachmentRepository} from 'src/infrastructure/repositories/attachment.r
 import {IAttachmentService} from 'src/domain/ports/attachment/interface.attachment.service';
 import {AttachmentService} from 'src/domain/services/attachment.service';
 import {AttachmentController} from "./controllers/attachment.controller";
+import {APP_FILTER} from '@nestjs/core';
+import {HttpExceptionMiddleware} from "../infrastructure/middlewares/HttpExceptionMiddleware";
 
 @Module({
     imports: [MailerModule.forRootAsync({
@@ -58,6 +60,10 @@ import {AttachmentController} from "./controllers/attachment.controller";
     controllers: [TripController, MemberController, ActivityController, AttachmentController],
     providers: [
         PrismaService,
+        {
+            provide: APP_FILTER,
+            useClass: HttpExceptionMiddleware,
+        },
         {
             provide: ITripRepository,
             useClass: TripRepository
