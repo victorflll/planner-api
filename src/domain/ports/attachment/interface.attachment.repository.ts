@@ -8,7 +8,7 @@ export abstract class IAttachmentRepository {
 
     abstract get(tripId: string): Promise<Attachment[]>;
 
-    abstract getById(id: string, tripId: string): Promise<Attachment | null>;
+    abstract getById(id: string, tripId: string): Promise<Attachment>;
 
     abstract update(id: string, tripId: string, data: UpdateAttachmentDto): Promise<Attachment>;
     

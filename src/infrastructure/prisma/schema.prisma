@@ -14,14 +14,14 @@ datasource db {
 }
 
 model Trip {
-  id         String       @id @default(uuid())
-  city       String
-  country    String
-  startDate  DateTime     @map("start_date")
-  endDate    DateTime     @map("end_date")
-  Member     Member[]
-  Activities Activities[]
-  Attachment Attachment[]
+  id          String       @id @default(uuid())
+  city        String
+  country     String
+  startDate   DateTime     @map("start_date")
+  endDate     DateTime     @map("end_date")
+  members     Member[]
+  activities  Activities[]
+  attachments Attachment[]
 
   @@map("trips")
 }
@@ -35,6 +35,7 @@ model Member {
   owner  Boolean
   status Boolean
 
+  @@unique([tripId, email])
   @@map("members")
 }
 
@@ -46,6 +47,7 @@ model Activities {
   date   DateTime
   status Boolean
 
+  @@unique([tripId, title, date])
   @@map("activities")
 }
 
@@ -56,5 +58,6 @@ model Attachment {
   title  String
   link   String
 
+  @@unique([tripId, link])
   @@map("attachments")
 }

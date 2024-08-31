@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { IAttachmentService } from "../../domain/ports/attachment/interface.attachment.service";
-import { IAttachmentRepository } from "../../domain/ports/attachment/interface.attachment.repository";
-import { CreateAttachmentDto } from "../../domain/models/attachment/create.attachment.dto";
-import { UpdateAttachmentDto } from "../../domain/models/attachment/update.attachment.dto";
+import { IAttachmentService } from "../ports/attachment/interface.attachment.service";
+import { IAttachmentRepository } from "../ports/attachment/interface.attachment.repository";
+import { CreateAttachmentDto } from "../models/attachment/create.attachment.dto";
+import { UpdateAttachmentDto } from "../models/attachment/update.attachment.dto";
 import { Attachment } from "@prisma/client";
 
 @Injectable()
@@ -17,7 +17,7 @@ export class AttachmentService implements IAttachmentService {
         return this.attachmentRepository.get(tripId); 
     }
 
-    async getById(id: string, tripId: string): Promise<Attachment | null> {
+    async getById(id: string, tripId: string): Promise<Attachment> {
         return this.attachmentRepository.getById(id, tripId); 
     }
 

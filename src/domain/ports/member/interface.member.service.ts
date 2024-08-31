@@ -8,9 +8,9 @@ export abstract class IMemberService {
 
     abstract get(tripId: string): Promise<MemberDto[]>;
 
-    abstract getById(id: string, tripId: string): Promise<Member | null>;
+    abstract getById(id: string, tripId: string): Promise<Member>;
 
-    abstract getByEmail(email: string, tripId: string): Promise<Member | null>;
+    abstract getByEmail(email: string, tripId: string): Promise<Member>;
 
     abstract confirm(id: string, tripId: string, dto: UpdateMemberDto): void;
 

@@ -1,47 +1,62 @@
-import { PrismaService } from "../prisma.service";
-import { CreateActivityDto } from "../../domain/models/activity/create.activity.dto";
-import { Activities } from "@prisma/client";
-import { UpdateActivityDto } from "../../domain/models/activity/update.activity.dto";
-import { IActivityRepository } from "../../domain/ports/activity/interface.activity.repository";
-import { Injectable } from "@nestjs/common";
-import { ActivityGroupDto } from "../../domain/models/activity/activity.group.dto";
-import { ActivityDto } from "../../domain/models/activity/activity.dto";
+import {PrismaService} from "../prisma.service";
+import {CreateActivityDto} from "../../domain/models/activity/create.activity.dto";
+import {Activities} from "@prisma/client";
+import {UpdateActivityDto} from "../../domain/models/activity/update.activity.dto";
+import {IActivityRepository} from "../../domain/ports/activity/interface.activity.repository";
+import {
+    BadRequestException,
+    ConflictException,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException
+} from "@nestjs/common";
+import {ActivityGroupDto} from "../../domain/models/activity/activity.group.dto";
+import {ActivityDto} from "../../domain/models/activity/activity.dto";
+import {ITripRepository} from "../../domain/ports/trip/interface.trip.repository";
 
 @Injectable()
 export class ActivityRepository implements IActivityRepository {
-    constructor(private readonly prismaService: PrismaService) {}
+    private primaryKeyViolationCode: string = "P2002";
+
+    constructor(private readonly prismaService: PrismaService, private readonly tripRepository: ITripRepository) {
+    }
 
     async create(data: CreateActivityDto[], tripId: string): Promise<void> {
-        const trip = await this.prismaService.trip.findUnique({
-            where: { id: tripId },
-            select: { startDate: true, endDate: true },
-        });
-
-        if (!trip) {
-            throw new Error('Trip not found');
-        }
+        const trip = await this.tripRepository.getById(tripId);
 
         data.forEach(activity => {
             if (new Date(activity.date) < trip.startDate || new Date(activity.date) > trip.endDate) {
-                throw new Error(`Activity date ${activity.date} is outside the trip dates`);
+                throw new BadRequestException(`Activity date ${activity.date} is outside the trip dates.`);
             }
         });
 
-        await this.prismaService.activities.createMany({
-            data: data.map(activity => ({
-                title: activity.title,
-                date: activity.date,
-                tripId: tripId,
-                status: false,
-            })),
-        });
+        try {
+            await this.prismaService.activities.createMany({
+                data: data.map(activity => ({
+                    title: activity.title,
+                    date: activity.date,
+                    tripId: tripId,
+                    status: false,
+                })),
+            });
+        } catch (error) {
+            if (error.code === this.primaryKeyViolationCode) {
+                throw new ConflictException("An activity with the same title, date and trip already exists.");
+            } else {
+                throw new InternalServerErrorException();
+            }
+        }
     }
 
     async get(tripId: string): Promise<ActivityGroupDto[]> {
+        const trip = await this.tripRepository.getById(tripId);
+
         const query = await this.prismaService.activities.findMany({
-            where: { tripId: tripId },
+            where: {
+                tripId: trip.id
+            },
             orderBy: {
-                date: 'asc', 
+                date: 'asc',
             },
         });
 
@@ -77,47 +92,78 @@ export class ActivityRepository implements IActivityRepository {
 
         return result;
     }
-    
-    async getById(id: string, tripId: string): Promise<Activities | null> {
-        return this.prismaService.activities.findUnique({
-            where: { id: id, tripId: tripId }
+
+    async getById(id: string, tripId: string): Promise<Activities> {
+        const result = await this.prismaService.activities.findUnique({
+            where: {
+                id: id,
+                tripId: tripId
+            }
         });
+
+        if (!result) {
+            throw new NotFoundException('Activity not found in this trip.');
+        }
+
+        return result;
     }
 
     async update(id: string, tripId: string, data: UpdateActivityDto): Promise<void> {
-        const trip = await this.prismaService.trip.findUnique({
-            where: { id: tripId },
-            select: { startDate: true, endDate: true },
-        });
-
-        if (!trip) {
-            throw new Error('Trip not found');
-        }
+        const trip = await this.tripRepository.getById(tripId);
 
         const activityDate = new Date(data.date);
         if (activityDate < trip.startDate || activityDate > trip.endDate) {
-            throw new Error(`Activity date ${data.date} is outside the trip dates`);
+            throw new BadRequestException(`Activity date ${data.date} is outside the trip dates.`);
         }
 
+        const activity = await this.getById(id, tripId);
+
+        try {
+            await this.prismaService.activities.update({
+                where: {
+                    id: activity.id,
+                    tripId: tripId
+                },
+                data: {
+                    title: data.title,
+                    date: activityDate,
+                },
+            });
+        } catch (error) {
+            if (error.code === this.primaryKeyViolationCode) {
+                throw new ConflictException("An activity with the same title, date and trip already exists.");
+            } else {
+                throw new InternalServerErrorException("An unknown error occurred. please contact the responsible team for more information.");
+            }
+        }
+    }
+
+    async confirm(id: string, tripId: string): Promise<void> {
+        const trip = await this.tripRepository.getById(tripId);
+
+        const activity = await this.getById(id, tripId);
+
         await this.prismaService.activities.update({
-            where: { id: id, tripId: tripId },
+            where: {
+                id: activity.id,
+                tripId: trip.id
+            },
             data: {
-                title: data.title,
-                date: activityDate,
+                status: true
             },
         });
     }
 
-    async confirm(id: string, tripId: string): Promise<void> {
-        await this.prismaService.activities.update({
-            where: { id: id, tripId: tripId },
-            data: { status: true },
-        });
-    }
-
     async delete(id: string, tripId: string): Promise<void> {
+        const trip = await this.tripRepository.getById(tripId);
+
+        const activity = await this.getById(id, tripId);
+
         await this.prismaService.activities.delete({
-            where: { id: id, tripId: tripId }
+            where: {
+                id: activity.id,
+                tripId: trip.id
+            }
         });
     }
 }

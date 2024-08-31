@@ -9,7 +9,7 @@ export abstract class IActivityService {
 
     abstract get(tripId: string): Promise<ActivityGroupDto[]>;
 
-    abstract getById(id: string, tripId: string): Promise<Activities | null>;
+    abstract getById(id: string, tripId: string): Promise<Activities>;
 
     abstract update(id: string, tripId: string, dto: UpdateActivityDto): Promise<void>;
 

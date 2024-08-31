@@ -1,13 +1,14 @@
-import {Body, Controller, Delete, Get, Param, Patch, Post, Put, Query} from '@nestjs/common';
-import {ApiBody, ApiParam, ApiTags} from "@nestjs/swagger";
+import {Body, Controller, Delete, Get, Param, Patch, Post, Query, UseFilters} from '@nestjs/common';
+import {ApiBody, ApiTags} from "@nestjs/swagger";
 import {IMemberService} from "../../domain/ports/member/interface.member.service";
 import {CreateMemberDto} from "../../domain/models/member/create.member.dto";
 import {UpdateMemberDto} from "../../domain/models/member/update.member.dto";
 import {MemberQueryParams} from "../../domain/utils/member.query.params";
-import {TripOwner} from "../../domain/models/trip/trip.owner.model";
+import {HttpExceptionMiddleware} from "../../infrastructure/middlewares/HttpExceptionMiddleware";
 
 @ApiTags('Member')
 @Controller('members')
+@UseFilters(HttpExceptionMiddleware)
 export class MemberController {
     constructor(private readonly memberService: IMemberService) {
     }
@@ -20,17 +21,17 @@ export class MemberController {
     @Post('/')
     @ApiBody({type: [CreateMemberDto]})
     create(@Body() data: CreateMemberDto[], @Query() params: MemberQueryParams) {
-        this.memberService.create(data, params.tripId);
+        return this.memberService.create(data, params.tripId);
+    }
+
+    @Get('/email')
+    async getByEmail(@Query('email') email: string, @Query() params: MemberQueryParams) {
+        return await this.memberService.getByEmail(email, params.tripId);
     }
 
     @Get('/:id')
     async getById(@Param('id') id: string, @Query() params: MemberQueryParams) {
         return await this.memberService.getById(id, params.tripId);
-    }
-
-    @Get('/:email')
-    async getByEmail(@Param('email') email: string, @Query() params: MemberQueryParams) {
-        return await this.memberService.getByEmail(email, params.tripId);
     }
 
     @Patch('confirm/:id')
@@ -39,7 +40,7 @@ export class MemberController {
         @Param('id') id: string,
         @Query() params: MemberQueryParams,
     ) {
-        this.memberService.confirm(id, params.tripId, data);
+        return this.memberService.confirm(id, params.tripId, data);
     }
 
     @Delete('/:id')

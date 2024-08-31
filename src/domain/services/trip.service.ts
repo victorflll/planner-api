@@ -17,7 +17,6 @@ export class TripService implements ITripService {
         return this.tripRepository.getCities(startsWith);
     }
 
-
     async create(data: CreateTripDto) {
         const tripId = await this.tripRepository.create(data);
 
@@ -26,19 +25,19 @@ export class TripService implements ITripService {
     }
 
     delete(id: string): void {
-        this.tripRepository.delete(id);
+        return this.tripRepository.delete(id);
     }
 
     get(): Promise<Trip[]> {
         return this.tripRepository.get();
     }
 
-    getById(id: string): Promise<Trip | null> {
+    getById(id: string): Promise<Trip> {
         return this.tripRepository.getById(id);
     }
 
     update(id: string, data: UpdateTripDto): void {
-        this.tripRepository.update(id, data);
+        return this.tripRepository.update(id, data);
     }
 
 }

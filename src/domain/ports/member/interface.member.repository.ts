@@ -10,9 +10,9 @@ export abstract class IMemberRepository {
 
     abstract get(tripId: string): Promise<Member[]>;
 
-    abstract getById(id: string, tripId: string): Promise<Member | null>;
+    abstract getById(id: string, tripId: string): Promise<Member>;
 
-    abstract getByEmail(email: string, tripId: string): Promise<Member | null>;
+    abstract getByEmail(email: string, tripId: string): Promise<Member>;
 
     abstract confirm(id: string, tripId: string, dto: UpdateMemberDto): void;
 
