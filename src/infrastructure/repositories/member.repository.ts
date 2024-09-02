@@ -1,11 +1,11 @@
-import {Member} from "@prisma/client";
-import {CreateMemberDto} from "src/domain/models/member/create.member.dto";
-import {IMemberRepository} from "../../domain/ports/member/interface.member.repository";
-import {PrismaService} from "../prisma.service";
-import {UpdateMemberDto} from "../../domain/models/member/update.member.dto";
-import {ConflictException, Injectable, InternalServerErrorException, NotFoundException} from "@nestjs/common";
-import {TripOwner} from "../../domain/models/trip/trip.owner.model";
-import {ITripRepository} from "../../domain/ports/trip/interface.trip.repository";
+import { Member } from "@prisma/client";
+import { CreateMemberDto } from "src/domain/models/member/create.member.dto";
+import { IMemberRepository } from "../../domain/ports/member/interface.member.repository";
+import { PrismaService } from "../prisma.service";
+import { UpdateMemberDto } from "../../domain/models/member/update.member.dto";
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException, BadRequestException } from "@nestjs/common";
+import { TripOwner } from "../../domain/models/trip/trip.owner.model";
+import { ITripRepository } from "../../domain/ports/trip/interface.trip.repository";
 
 @Injectable()
 export class MemberRepository implements IMemberRepository {
@@ -15,6 +15,16 @@ export class MemberRepository implements IMemberRepository {
     }
 
     async createOwner(data: TripOwner, tripId: string) {
+        if (!data.name || typeof data.name !== "string" || data.name.trim() === "") {
+            throw new BadRequestException("Name must be a non-empty string.");
+        }
+        if (!data.email || typeof data.email !== "string") {
+            throw new BadRequestException("Email must be a string.");
+        }
+        if (!tripId || typeof tripId !== "string") {
+            throw new BadRequestException("Invalid trip ID.");
+        }
+
         await this.prismaService.member.create({
             data: {
                 name: data.name,
@@ -27,9 +37,22 @@ export class MemberRepository implements IMemberRepository {
     }
 
     async create(data: CreateMemberDto[], tripId: string) {
+        if (!tripId || typeof tripId !== "string") {
+            throw new BadRequestException("Invalid trip ID.");
+        }
+
+        data.forEach((member) => {
+            if (!member.email || typeof member.email !== "string") {
+                throw new BadRequestException("Email must be a string.");
+            }
+            if (typeof member.owner !== "boolean") {
+                throw new BadRequestException("Owner must be a boolean.");
+            }
+        });
+
         try {
             await this.prismaService.member.createMany({
-                data: data.map(member => ({
+                data: data.map((member) => ({
                     email: member.email,
                     owner: member.owner,
                     status: member.owner,
@@ -46,6 +69,10 @@ export class MemberRepository implements IMemberRepository {
     }
 
     async get(tripId: string): Promise<Member[]> {
+        if (!tripId || typeof tripId !== "string") {
+            throw new BadRequestException("Invalid trip ID.");
+        }
+
         const trip = await this.tripRepository.getById(tripId);
 
         return this.prismaService.member.findMany({
@@ -56,10 +83,11 @@ export class MemberRepository implements IMemberRepository {
     }
 
     async getById(id: string, tripId: string): Promise<Member> {
-        const trip = await this.tripRepository.getById(tripId);
+        if (!id || typeof id !== "string" || !tripId || typeof tripId !== "string") {
+            throw new BadRequestException("Invalid ID or trip ID.");
+        }
 
-        console.log(id);
-        console.log(tripId);
+        const trip = await this.tripRepository.getById(tripId);
 
         const result = await this.prismaService.member.findUnique({
             where: {
@@ -76,6 +104,13 @@ export class MemberRepository implements IMemberRepository {
     }
 
     async getByEmail(email: string, tripId: string): Promise<Member> {
+        if (!email || typeof email !== "string") {
+            throw new BadRequestException("Email must be a string.");
+        }
+        if (!tripId || typeof tripId !== "string") {
+            throw new BadRequestException("Invalid trip ID.");
+        }
+
         const trip = await this.tripRepository.getById(tripId);
 
         const result = await this.prismaService.member.findFirst({
@@ -93,6 +128,13 @@ export class MemberRepository implements IMemberRepository {
     }
 
     async confirm(id: string, tripId: string, dto: UpdateMemberDto) {
+        if (!id || typeof id !== "string" || !tripId || typeof tripId !== "string") {
+            throw new BadRequestException("Invalid ID or trip ID.");
+        }
+        if (!dto.name || typeof dto.name !== "string" || dto.name.trim() === "") {
+            throw new BadRequestException("Name must be a non-empty string.");
+        }
+
         const trip = await this.tripRepository.getById(tripId);
 
         const member = await this.getById(id, tripId);
@@ -110,6 +152,10 @@ export class MemberRepository implements IMemberRepository {
     }
 
     async delete(id: string, tripId: string) {
+        if (!id || typeof id !== "string" || !tripId || typeof tripId !== "string") {
+            throw new BadRequestException("Invalid ID or trip ID.");
+        }
+
         const trip = await this.tripRepository.getById(tripId);
 
         const member = await this.getById(id, tripId);

@@ -1,8 +1,8 @@
-import {PrismaService} from "../prisma.service";
-import {CreateActivityDto} from "../../domain/models/activity/create.activity.dto";
-import {Activities} from "@prisma/client";
-import {UpdateActivityDto} from "../../domain/models/activity/update.activity.dto";
-import {IActivityRepository} from "../../domain/ports/activity/interface.activity.repository";
+import { PrismaService } from "../prisma.service";
+import { CreateActivityDto } from "../../domain/models/activity/create.activity.dto";
+import { Activities } from "@prisma/client";
+import { UpdateActivityDto } from "../../domain/models/activity/update.activity.dto";
+import { IActivityRepository } from "../../domain/ports/activity/interface.activity.repository";
 import {
     BadRequestException,
     ConflictException,
@@ -10,9 +10,9 @@ import {
     InternalServerErrorException,
     NotFoundException
 } from "@nestjs/common";
-import {ActivityGroupDto} from "../../domain/models/activity/activity.group.dto";
-import {ActivityDto} from "../../domain/models/activity/activity.dto";
-import {ITripRepository} from "../../domain/ports/trip/interface.trip.repository";
+import { ActivityGroupDto } from "../../domain/models/activity/activity.group.dto";
+import { ActivityDto } from "../../domain/models/activity/activity.dto";
+import { ITripRepository } from "../../domain/ports/trip/interface.trip.repository";
 
 @Injectable()
 export class ActivityRepository implements IActivityRepository {
@@ -22,19 +22,39 @@ export class ActivityRepository implements IActivityRepository {
     }
 
     async create(data: CreateActivityDto[], tripId: string): Promise<void> {
-        const trip = await this.tripRepository.getById(tripId);
+        if (!tripId || typeof tripId !== 'string') {
+            throw new BadRequestException('Invalid trip ID.');
+        }
 
-        data.forEach(activity => {
-            if (new Date(activity.date) < trip.startDate || new Date(activity.date) > trip.endDate) {
+        const trip = await this.tripRepository.getById(tripId);
+        if (!trip) {
+            throw new NotFoundException('Trip not found.');
+        }
+
+        data.forEach((activity) => {
+            if (!activity.title || typeof activity.title !== 'string' || activity.title.trim() === '') {
+                throw new BadRequestException('Title must be a non-empty string.');
+            }
+
+            if (!activity.date || typeof activity.date !== 'string') {
+                throw new BadRequestException('Date must be a string.');
+            }
+
+            const activityDate = new Date(activity.date);
+            if (isNaN(activityDate.getTime())) {
+                throw new BadRequestException('Date must be a valid ISO string.');
+            }
+
+            if (activityDate < trip.startDate || activityDate > trip.endDate) {
                 throw new BadRequestException(`Activity date ${activity.date} is outside the trip dates.`);
             }
         });
 
         try {
             await this.prismaService.activities.createMany({
-                data: data.map(activity => ({
+                data: data.map((activity) => ({
                     title: activity.title,
-                    date: activity.date,
+                    date: new Date(activity.date),
                     tripId: tripId,
                     status: false,
                 })),
@@ -49,22 +69,35 @@ export class ActivityRepository implements IActivityRepository {
     }
 
     async get(tripId: string): Promise<ActivityGroupDto[]> {
+        if (!tripId || typeof tripId !== 'string') {
+            throw new BadRequestException('Invalid trip ID.');
+        }
+
         const trip = await this.tripRepository.getById(tripId);
+        if (!trip) {
+            throw new NotFoundException('Trip not found.');
+        }
 
         const query = await this.prismaService.activities.findMany({
             where: {
                 tripId: trip.id
             },
             orderBy: {
-                date: 'asc',
-            },
+                date: 'asc'
+            }
         });
 
         const formatDate = (date: string) => {
+            if (!date) {
+                throw new InternalServerErrorException('Date is invalid.');
+            }
             return date.split('T')[0];
         };
 
         const groupedActivities = query.reduce((groups, activity) => {
+            if (!activity.date) {
+                throw new InternalServerErrorException('Activity date is missing.');
+            }
             const dateDay = formatDate(activity.date.toISOString());
             if (!groups[dateDay]) {
                 groups[dateDay] = [];
@@ -74,7 +107,7 @@ export class ActivityRepository implements IActivityRepository {
                 tripId: activity.tripId,
                 title: activity.title,
                 date: activity.date.toISOString(),
-                status: activity.status,
+                status: activity.status
             });
             return groups;
         }, {} as Record<string, ActivityDto[]>);
@@ -87,13 +120,17 @@ export class ActivityRepository implements IActivityRepository {
                 title: activity.title,
                 date: activity.date,
                 status: activity.status
-            })),
+            }))
         }));
 
         return result;
     }
 
     async getById(id: string, tripId: string): Promise<Activities> {
+        if (!id || typeof id !== 'string' || !tripId || typeof tripId !== 'string') {
+            throw new BadRequestException('Invalid ID or trip ID.');
+        }
+
         const result = await this.prismaService.activities.findUnique({
             where: {
                 id: id,
@@ -109,9 +146,28 @@ export class ActivityRepository implements IActivityRepository {
     }
 
     async update(id: string, tripId: string, data: UpdateActivityDto): Promise<void> {
+        if (!id || typeof id !== 'string' || !tripId || typeof tripId !== 'string') {
+            throw new BadRequestException('Invalid ID or trip ID.');
+        }
+
         const trip = await this.tripRepository.getById(tripId);
+        if (!trip) {
+            throw new NotFoundException('Trip not found.');
+        }
+
+        if (!data.title || typeof data.title !== 'string') {
+            throw new BadRequestException('Title must be a non-empty string.');
+        }
+
+        if (!data.date || typeof data.date !== 'string') {
+            throw new BadRequestException('Date must be a string.');
+        }
 
         const activityDate = new Date(data.date);
+        if (isNaN(activityDate.getTime())) {
+            throw new BadRequestException('Invalid date format.');
+        }
+
         if (activityDate < trip.startDate || activityDate > trip.endDate) {
             throw new BadRequestException(`Activity date ${data.date} is outside the trip dates.`);
         }
@@ -126,20 +182,27 @@ export class ActivityRepository implements IActivityRepository {
                 },
                 data: {
                     title: data.title,
-                    date: activityDate,
-                },
+                    date: activityDate
+                }
             });
         } catch (error) {
             if (error.code === this.primaryKeyViolationCode) {
-                throw new ConflictException("An activity with the same title, date and trip already exists.");
+                throw new ConflictException('An activity with the same title, date and trip already exists.');
             } else {
-                throw new InternalServerErrorException("An unknown error occurred. please contact the responsible team for more information.");
+                throw new InternalServerErrorException('An unknown error occurred. Please contact the responsible team for more information.');
             }
         }
     }
 
     async confirm(id: string, tripId: string): Promise<void> {
+        if (!id || typeof id !== 'string' || !tripId || typeof tripId !== 'string') {
+            throw new BadRequestException('Invalid ID or trip ID.');
+        }
+
         const trip = await this.tripRepository.getById(tripId);
+        if (!trip) {
+            throw new NotFoundException('Trip not found.');
+        }
 
         const activity = await this.getById(id, tripId);
 
@@ -150,12 +213,19 @@ export class ActivityRepository implements IActivityRepository {
             },
             data: {
                 status: true
-            },
+            }
         });
     }
 
     async delete(id: string, tripId: string): Promise<void> {
+        if (!id || typeof id !== 'string' || !tripId || typeof tripId !== 'string') {
+            throw new BadRequestException('Invalid ID or trip ID.');
+        }
+
         const trip = await this.tripRepository.getById(tripId);
+        if (!trip) {
+            throw new NotFoundException('Trip not found.');
+        }
 
         const activity = await this.getById(id, tripId);
 
