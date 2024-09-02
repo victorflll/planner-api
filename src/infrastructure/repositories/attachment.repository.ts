@@ -1,4 +1,4 @@
-import {ConflictException, Injectable, InternalServerErrorException, NotFoundException} from "@nestjs/common";
+import {BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException} from "@nestjs/common";
 import {PrismaService} from "../prisma.service";
 import {IAttachmentRepository} from "../../domain/ports/attachment/interface.attachment.repository";
 import {CreateAttachmentDto} from "../../domain/models/attachment/create.attachment.dto";
@@ -9,11 +9,24 @@ import {ITripRepository} from "../../domain/ports/trip/interface.trip.repository
 @Injectable()
 export class AttachmentRepository implements IAttachmentRepository {
     private primaryKeyViolationCode: string = "P2002";
+    private readonly urlPattern = /^(https?:\/\/)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(\/[^\s]*)?$/;
 
     constructor(private readonly prismaService: PrismaService, private readonly tripRepository: ITripRepository) {
     }
 
+    private validateUrl(url: string): void {
+        if (!this.urlPattern.test(url)) {
+            throw new BadRequestException('Invalid URL format.');
+        }
+    }
+
     async create(data: CreateAttachmentDto[], tripId: string): Promise<void> {
+        data.forEach(attachment => {
+            if (attachment.link) {
+                this.validateUrl(attachment.link);
+            }
+        });
+
         try {
             await this.prismaService.attachment.createMany({
                 data: data.map(attachment => ({
@@ -24,7 +37,7 @@ export class AttachmentRepository implements IAttachmentRepository {
             });
         } catch (error) {
             if (error.code === this.primaryKeyViolationCode) {
-                throw new ConflictException("An activity with the same link and trip already exists.");
+                throw new ConflictException("An attachment with the same link and trip already exists.");
             } else {
                 throw new InternalServerErrorException();
             }
@@ -62,6 +75,10 @@ export class AttachmentRepository implements IAttachmentRepository {
         const trip = await this.tripRepository.getById(tripId);
 
         const attachment = await this.getById(id, tripId);
+
+        if (data.link) {
+            this.validateUrl(data.link);
+        }
 
         const result = await this.prismaService.attachment.update({
             where: {
