@@ -7,6 +7,7 @@ import {MemberQueryParams} from "../../domain/utils/member.query.params";
 import {HttpExceptionMiddleware} from "../../infrastructure/middlewares/HttpExceptionMiddleware";
 import {ValidateNested} from "class-validator";
 import {Type} from "class-transformer";
+import {CreateMemberListDto} from "../../domain/models/member/create.member.list.dto";
 
 @ApiTags('Member')
 @Controller('members')
@@ -21,9 +22,9 @@ export class MemberController {
     }
 
     @Post('/')
-    @ApiBody({type: [CreateMemberDto]})
-    create(@Body() data: CreateMemberDto[], @Query('tripId') tripId: string) {
-        return this.memberService.create(data, tripId);
+    @ApiBody({type: CreateMemberListDto})
+    create(@Body() data: CreateMemberListDto, @Query('tripId') tripId: string) {
+        return this.memberService.create(data.data, tripId);
     }
 
     @Get('/email')
