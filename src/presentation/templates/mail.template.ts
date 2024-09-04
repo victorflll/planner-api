@@ -82,7 +82,7 @@ export function mailTemplate(email: string, trip: Trip): string {
                 <div class="container">
                     <p>Você foi convidado(a) para participar de uma viagem para <strong>${trip.city} - ${trip.country}</strong> entre <strong>${startDate} a ${endDate}.</strong></p>
                     <p>Para confirmar sua presença na viagem, clique no link abaixo:</p>
-                    <a href="http://localhost:3000/route?${codified}"">Confirmar presença</a>
+                    <a href="http://localhost:3000/trip/confirmation?${codified}"">Confirmar presença</a>
                     <p>Caso você não saiba do que se trata esse e-mail ou não poderá estar presente, apenas ignore esse e-mail.</p>
                     <div class="footer">
                         <div class="logo">

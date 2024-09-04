@@ -6,6 +6,7 @@ import {UpdateActivityDto} from "../../domain/models/activity/update.activity.dt
 import {Activities} from '@prisma/client';
 import {ActivityGroupDto} from "../../domain/models/activity/activity.group.dto";
 import {HttpExceptionMiddleware} from "../../infrastructure/middlewares/HttpExceptionMiddleware";
+import {CreateActivityListDto} from "../../domain/models/activity/create.activity.list.dto";
 
 @ApiTags('Activity')
 @Controller('activities')
@@ -15,9 +16,9 @@ export class ActivityController {
     }
 
     @Post('/')
-    @ApiBody({type: [CreateActivityDto]})
-    async create(@Body() data: CreateActivityDto[], @Query('tripId') tripId: string) {
-        return await this.activityService.create(data, tripId);
+    @ApiBody({type: CreateActivityListDto})
+    async create(@Body() data: CreateActivityListDto, @Query('tripId') tripId: string) {
+        return await this.activityService.create(data.data, tripId);
     }
 
     @Get('/')

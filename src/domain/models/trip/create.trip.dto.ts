@@ -1,6 +1,6 @@
 import {ApiProperty} from "@nestjs/swagger";
 import {TripOwner} from "./trip.owner.model";
-import {IsEmail, IsNotEmpty, IsObject, IsString, ValidateNested} from "class-validator";
+import {IsNotEmpty, IsString, ValidateNested} from "class-validator";
 import {Type} from "class-transformer";
 import {CreateMemberDto} from "../member/create.member.dto";
 
