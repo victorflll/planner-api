@@ -1,11 +1,13 @@
 import {Member} from "@prisma/client";
-import {CreateMemberDto} from "src/domain/models/member/create.member.dto";
 import {IMemberRepository} from "../../domain/ports/member/interface.member.repository";
 import {PrismaService} from "../prisma.service";
 import {UpdateMemberDto} from "../../domain/models/member/update.member.dto";
-import {ConflictException, Injectable, InternalServerErrorException, NotFoundException} from "@nestjs/common";
-import {TripOwner} from "../../domain/models/trip/trip.owner.model";
+import {Injectable} from "@nestjs/common";
+import {ConflictException} from "../exceptions/ConflictException";
+import {InternalServerErrorException} from "../exceptions/InternalServerErrorException";
+import {NotFoundException} from "../exceptions/NotFoundException";import {TripOwner} from "../../domain/models/trip/trip.owner.model";
 import {ITripRepository} from "../../domain/ports/trip/interface.trip.repository";
+import {CreateMemberDto} from "../../domain/models/member/create.member.dto";
 
 @Injectable()
 export class MemberRepository implements IMemberRepository {
@@ -26,13 +28,13 @@ export class MemberRepository implements IMemberRepository {
         });
     }
 
-    async create(data: CreateMemberDto[], tripId: string) {
+    async create(members: CreateMemberDto[], tripId: string) {
         try {
             await this.prismaService.member.createMany({
-                data: data.map(member => ({
+                data: members.map(member => ({
                     email: member.email,
-                    owner: member.owner,
-                    status: member.owner,
+                    owner: false,
+                    status: false,
                     tripId: tripId,
                 })),
             });

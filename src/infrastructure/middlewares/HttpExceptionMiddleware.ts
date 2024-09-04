@@ -5,20 +5,31 @@ import {
     HttpException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import {CustomHttpException} from "../exceptions/CustomHttpException";
 
-@Catch(HttpException)
+@Catch(CustomHttpException)
 export class HttpExceptionMiddleware implements ExceptionFilter {
-    catch(exception: HttpException, host: ArgumentsHost) {
+    catch(exception: CustomHttpException, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
-        const request = ctx.getRequest<Request>();
         const status = exception.getStatus();
 
         response.status(status).json({
             statusCode: status,
-            timestamp: new Date().toISOString(),
-            path: request.url,
-            message: exception instanceof HttpException ? exception.message : 'An unknown error occurred. please contact the responsible team for more information.',
+            error: this.getErrorName(status),
+            message: [exception.message],
         });
+    }
+
+    private getErrorName(status: number): string {
+        const statusNames = {
+            400: 'Bad Request',
+            404: 'Not Found',
+            409: 'Conflict',
+            500: 'Internal Server Error',
+            502: 'Service Unavailable',
+        };
+
+        return statusNames[status] || 'Error';
     }
 }

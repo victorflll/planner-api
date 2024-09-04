@@ -1,5 +1,7 @@
-import {ConflictException, Injectable, InternalServerErrorException, NotFoundException} from "@nestjs/common";
-import {PrismaService} from "../prisma.service";
+import {Injectable} from "@nestjs/common";
+import {ConflictException} from "../exceptions/ConflictException";
+import {InternalServerErrorException} from "../exceptions/InternalServerErrorException";
+import {NotFoundException} from "../exceptions/NotFoundException";import {PrismaService} from "../prisma.service";
 import {IAttachmentRepository} from "../../domain/ports/attachment/interface.attachment.repository";
 import {CreateAttachmentDto} from "../../domain/models/attachment/create.attachment.dto";
 import {UpdateAttachmentDto} from "../../domain/models/attachment/update.attachment.dto";

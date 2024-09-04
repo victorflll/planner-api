@@ -3,16 +3,14 @@ import {CreateActivityDto} from "../../domain/models/activity/create.activity.dt
 import {Activities} from "@prisma/client";
 import {UpdateActivityDto} from "../../domain/models/activity/update.activity.dto";
 import {IActivityRepository} from "../../domain/ports/activity/interface.activity.repository";
-import {
-    BadRequestException,
-    ConflictException,
-    Injectable,
-    InternalServerErrorException,
-    NotFoundException
-} from "@nestjs/common";
 import {ActivityGroupDto} from "../../domain/models/activity/activity.group.dto";
 import {ActivityDto} from "../../domain/models/activity/activity.dto";
 import {ITripRepository} from "../../domain/ports/trip/interface.trip.repository";
+import {Injectable} from "@nestjs/common";
+import {BadRequestException} from "../exceptions/BadRequestException";
+import {ConflictException} from "../exceptions/ConflictException";
+import {InternalServerErrorException} from "../exceptions/InternalServerErrorException";
+import {NotFoundException} from "../exceptions/NotFoundException";
 
 @Injectable()
 export class ActivityRepository implements IActivityRepository {

@@ -6,7 +6,7 @@ import {TripOwner} from "../../models/trip/trip.owner.model";
 export abstract class IMemberRepository {
     abstract createOwner(data: TripOwner, tripId: string): void;
 
-    abstract create(data: CreateMemberDto[], tripId: string): void;
+    abstract create(members: CreateMemberDto[], tripId: string): void;
 
     abstract get(tripId: string): Promise<Member[]>;
 
