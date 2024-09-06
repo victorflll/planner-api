@@ -2,6 +2,7 @@ import {NestFactory} from '@nestjs/core';
 import {AppModule} from './presentation/app.module';
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 import {HttpExceptionMiddleware} from "./infrastructure/middlewares/HttpExceptionMiddleware";
+import {ValidationPipe} from "@nestjs/common";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -17,6 +18,11 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, document);
 
     app.useGlobalFilters(new HttpExceptionMiddleware())
+    app.useGlobalPipes(new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+    }));
     await app.listen(3333);
 }
 

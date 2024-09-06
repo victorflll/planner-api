@@ -3,8 +3,9 @@ import {CreateTripDto} from "../../domain/models/trip/create.trip.dto";
 import {Trip} from "@prisma/client";
 import {UpdateTripDto} from "../../domain/models/trip/update.trip.dto";
 import {ITripRepository} from "../../domain/ports/trip/interface.trip.repository";
-import {Injectable, NotFoundException, ServiceUnavailableException} from "@nestjs/common";
-import {LocationModel, mapToCity} from "../../domain/models/trip/location.model";
+import {Injectable} from "@nestjs/common";
+import {ServiceUnavailableException} from "../exceptions/ServiceUnavailableException";
+import {NotFoundException} from "../exceptions/NotFoundException";import {LocationModel, mapToCity} from "../../domain/models/trip/location.model";
 import {firstValueFrom} from "rxjs";
 import {HttpService} from "@nestjs/axios";
 

@@ -5,6 +5,7 @@ import { CreateAttachmentDto } from "../../domain/models/attachment/create.attac
 import { UpdateAttachmentDto } from "../../domain/models/attachment/update.attachment.dto";
 import { Attachment } from "@prisma/client";
 import {HttpExceptionMiddleware} from "../../infrastructure/middlewares/HttpExceptionMiddleware";
+import {CreateAttachmentListDto} from "../../domain/models/attachment/create.attachment.list.dto";
 
 @ApiTags('Attachment')
 @Controller('attachments')
@@ -13,9 +14,9 @@ export class AttachmentController {
     constructor(private readonly attachmentService: IAttachmentService) {}
 
     @Post('/')
-    @ApiBody({ type: [CreateAttachmentDto] })
-    create(@Body() data: CreateAttachmentDto[], @Query('tripId') tripId: string): void {
-        return this.attachmentService.create(data, tripId);
+    @ApiBody({ type: CreateAttachmentListDto })
+    create(@Body() data: CreateAttachmentListDto, @Query('tripId') tripId: string): void {
+        return this.attachmentService.create(data.data, tripId);
     }
 
     @Get('/')

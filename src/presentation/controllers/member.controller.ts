@@ -5,6 +5,9 @@ import {CreateMemberDto} from "../../domain/models/member/create.member.dto";
 import {UpdateMemberDto} from "../../domain/models/member/update.member.dto";
 import {MemberQueryParams} from "../../domain/utils/member.query.params";
 import {HttpExceptionMiddleware} from "../../infrastructure/middlewares/HttpExceptionMiddleware";
+import {ValidateNested} from "class-validator";
+import {Type} from "class-transformer";
+import {CreateMemberListDto} from "../../domain/models/member/create.member.list.dto";
 
 @ApiTags('Member')
 @Controller('members')
@@ -14,37 +17,37 @@ export class MemberController {
     }
 
     @Get('/')
-    async get(@Query() params: MemberQueryParams) {
-        return await this.memberService.get(params.tripId);
+    async get(@Query('tripId') tripId: string) {
+        return await this.memberService.get(tripId);
     }
 
     @Post('/')
-    @ApiBody({type: [CreateMemberDto]})
-    create(@Body() data: CreateMemberDto[], @Query() params: MemberQueryParams) {
-        return this.memberService.create(data, params.tripId);
+    @ApiBody({type: CreateMemberListDto})
+    create(@Body() data: CreateMemberListDto, @Query('tripId') tripId: string) {
+        return this.memberService.create(data.data, tripId);
     }
 
     @Get('/email')
-    async getByEmail(@Query('email') email: string, @Query() params: MemberQueryParams) {
-        return await this.memberService.getByEmail(email, params.tripId);
+    async getByEmail(@Query('email') email: string, @Query('tripId') tripId: string) {
+        return await this.memberService.getByEmail(email, tripId);
     }
 
     @Get('/:id')
-    async getById(@Param('id') id: string, @Query() params: MemberQueryParams) {
-        return await this.memberService.getById(id, params.tripId);
+    async getById(@Param('id') id: string, @Query('tripId') tripId: string) {
+        return await this.memberService.getById(id, tripId);
     }
 
     @Patch('confirm/:id')
     update(
         @Body() data: UpdateMemberDto,
         @Param('id') id: string,
-        @Query() params: MemberQueryParams,
+        @Query('tripId') tripId: string,
     ) {
-        return this.memberService.confirm(id, params.tripId, data);
+        return this.memberService.confirm(id, tripId, data);
     }
 
     @Delete('/:id')
-    delete(@Param('id') id: string, @Query() params: MemberQueryParams) {
-        return this.memberService.delete(id, params.tripId);
+    delete(@Param('id') id: string, @Query('tripId') tripId: string) {
+        return this.memberService.delete(id, tripId);
     }
 }
