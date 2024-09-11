@@ -10,6 +10,7 @@ import {ITripRepository} from "../ports/trip/interface.trip.repository";
 import {invitationMailTemplate} from "../../presentation/assets/templates/invitation.mail.template";
 import {TripOwner} from "../models/trip/trip.owner.model";
 import {createTripMailTemplate} from "../../presentation/assets/templates/create.trip.mail.template";
+import {BadRequestException} from "../../infrastructure/exceptions/BadRequestException";
 
 @Injectable()
 export class MemberService implements IMemberService {
@@ -69,7 +70,13 @@ export class MemberService implements IMemberService {
         return this.memberRepository.confirm(email, tripId, dto);
     }
 
-    delete(id: string, tripId: string): void {
+    async delete(id: string, tripId: string) {
+        const member = await this.memberRepository.getById(id, tripId);
+
+        if (member.owner) {
+            throw new BadRequestException("The member owner cannot be deleted.");
+        }
+
         return this.memberRepository.delete(id, tripId);
     }
 }

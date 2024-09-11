@@ -116,6 +116,8 @@ export class MemberRepository implements IMemberRepository {
 
         const member = await this.getById(id, tripId);
 
+        if (!member) {}
+
         await this.prismaService.member.delete({
             where: {
                 id: member.id,
