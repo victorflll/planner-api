@@ -6,22 +6,23 @@ import {UpdateTripDto} from "../models/trip/update.trip.dto";
 import {ITripRepository} from "../ports/trip/interface.trip.repository";
 import {LocationModel} from "../models/trip/location.model";
 import {IMemberService} from "../ports/member/interface.member.service";
-import {IMemberRepository} from "../ports/member/interface.member.repository";
 
 @Injectable()
 export class TripService implements ITripService {
-    constructor(private memberService: IMemberService, private tripRepository: ITripRepository, private memberRepository: IMemberRepository) {
+    constructor(private memberService: IMemberService, private tripRepository: ITripRepository) {
     }
 
     getCities(startsWith: string): Promise<LocationModel[]> {
         return this.tripRepository.getCities(startsWith);
     }
 
-    async create(data: CreateTripDto) {
-        const tripId = await this.tripRepository.create(data);
+    async create(data: CreateTripDto): Promise<Trip> {
+        const trip = await this.tripRepository.create(data);
 
-        this.memberService.createOwner(data.owner, tripId);
-        this.memberService.create(data.members, tripId);
+        this.memberService.createOwner(data.owner, trip.id);
+        this.memberService.create(data.members, trip.id);
+
+        return trip;
     }
 
     delete(id: string): void {

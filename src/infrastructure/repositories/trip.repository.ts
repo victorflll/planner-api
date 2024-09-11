@@ -30,20 +30,17 @@ export class TripRepository implements ITripRepository {
         return result;
     }
 
-    async create(data: CreateTripDto): Promise<string> {
+    async create(data: CreateTripDto): Promise<Trip> {
         const trip = await this.prismaService.trip.create({
             data: {
                 city: data.city,
                 country: data.country,
                 startDate: data.startDate,
                 endDate: data.endDate,
-            },
-            select: {
-                id: true
             }
         });
 
-        return trip.id;
+        return trip;
     }
 
     async get(): Promise<Trip[]> {
