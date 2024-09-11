@@ -60,9 +60,6 @@ export class MemberRepository implements IMemberRepository {
     async getById(id: string, tripId: string): Promise<Member> {
         const trip = await this.tripRepository.getById(tripId);
 
-        console.log(id);
-        console.log(tripId);
-
         const result = await this.prismaService.member.findUnique({
             where: {
                 id: id,
