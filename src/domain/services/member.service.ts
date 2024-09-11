@@ -63,8 +63,8 @@ export class MemberService implements IMemberService {
         return this.memberRepository.getByEmail(email, tripId);
     }
 
-    confirm(id: string, tripId: string, dto: UpdateMemberDto): void {
-        return this.memberRepository.confirm(id, tripId, dto);
+    confirm(email: string, tripId: string, dto: UpdateMemberDto): void {
+        return this.memberRepository.confirm(email, tripId, dto);
     }
 
     delete(id: string, tripId: string): void {

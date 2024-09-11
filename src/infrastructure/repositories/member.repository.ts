@@ -94,10 +94,10 @@ export class MemberRepository implements IMemberRepository {
         return result;
     }
 
-    async confirm(id: string, tripId: string, dto: UpdateMemberDto) {
+    async confirm(email: string, tripId: string, dto: UpdateMemberDto) {
         const trip = await this.tripRepository.getById(tripId);
 
-        const member = await this.getById(id, tripId);
+        const member = await this.getByEmail(email, tripId);
 
         await this.prismaService.member.update({
             where: {

@@ -14,7 +14,7 @@ export abstract class IMemberRepository {
 
     abstract getByEmail(email: string, tripId: string): Promise<Member>;
 
-    abstract confirm(id: string, tripId: string, dto: UpdateMemberDto): void;
+    abstract confirm(email: string, tripId: string, dto: UpdateMemberDto): void;
 
     abstract delete(id: string, tripId: string): void;
 }
