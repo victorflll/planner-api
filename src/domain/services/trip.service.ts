@@ -20,7 +20,7 @@ export class TripService implements ITripService {
     async create(data: CreateTripDto) {
         const tripId = await this.tripRepository.create(data);
 
-        this.memberRepository.createOwner(data.owner, tripId);
+        this.memberService.createOwner(data.owner, tripId);
         this.memberService.create(data.members, tripId);
     }
 

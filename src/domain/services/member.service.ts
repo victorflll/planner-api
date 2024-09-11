@@ -7,11 +7,22 @@ import {IMemberRepository} from "../ports/member/interface.member.repository";
 import {Injectable} from "@nestjs/common";
 import {IMailService} from "../ports/email/interface.mail.service";
 import {ITripRepository} from "../ports/trip/interface.trip.repository";
-import {mailTemplate} from "../../presentation/templates/mail.template";
+import {invitationMailTemplate} from "../../presentation/assets/templates/invitation.mail.template";
+import {TripOwner} from "../models/trip/trip.owner.model";
+import {createTripMailTemplate} from "../../presentation/assets/templates/create.trip.mail.template";
 
 @Injectable()
 export class MemberService implements IMemberService {
     constructor(private readonly memberRepository: IMemberRepository, private readonly mailService: IMailService, private tripRepository: ITripRepository) {
+    }
+
+    async createOwner(data: TripOwner, tripId: string) {
+        const trip = await this.tripRepository.getById(tripId);
+
+        const template = createTripMailTemplate(data.email, trip);
+        this.mailService.sendMail(data.email, "Confirmação de Viagem!", template);
+
+        return this.memberRepository.createOwner(data, tripId);
     }
 
     async create(data: CreateMemberDto[], tripId: string) {
@@ -19,7 +30,7 @@ export class MemberService implements IMemberService {
 
         if (trip != null) {
             for (const member of data) {
-                const template = mailTemplate(member.email, trip);
+                const template = invitationMailTemplate(member.email, trip);
                 this.mailService.sendMail(member.email, "Convite para Viagem!", template);
             }
 
