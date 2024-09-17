@@ -7,11 +7,23 @@ import {IMemberRepository} from "../ports/member/interface.member.repository";
 import {Injectable} from "@nestjs/common";
 import {IMailService} from "../ports/email/interface.mail.service";
 import {ITripRepository} from "../ports/trip/interface.trip.repository";
-import {mailTemplate} from "../../presentation/templates/mail.template";
+import {invitationMailTemplate} from "../../presentation/assets/templates/invitation.mail.template";
+import {TripOwner} from "../models/trip/trip.owner.model";
+import {createTripMailTemplate} from "../../presentation/assets/templates/create.trip.mail.template";
+import {BadRequestException} from "../../infrastructure/exceptions/BadRequestException";
 
 @Injectable()
 export class MemberService implements IMemberService {
     constructor(private readonly memberRepository: IMemberRepository, private readonly mailService: IMailService, private tripRepository: ITripRepository) {
+    }
+
+    async createOwner(data: TripOwner, tripId: string) {
+        const trip = await this.tripRepository.getById(tripId);
+
+        const template = createTripMailTemplate(data.email, trip);
+        this.mailService.sendMail(data.email, "Confirmação de Viagem!", template);
+
+        return this.memberRepository.createOwner(data, tripId);
     }
 
     async create(data: CreateMemberDto[], tripId: string) {
@@ -19,7 +31,7 @@ export class MemberService implements IMemberService {
 
         if (trip != null) {
             for (const member of data) {
-                const template = mailTemplate(member.email, trip);
+                const template = invitationMailTemplate(member.email, trip);
                 this.mailService.sendMail(member.email, "Convite para Viagem!", template);
             }
 
@@ -34,6 +46,8 @@ export class MemberService implements IMemberService {
 
         for (const member of members) {
             result.push({
+                id: member.id,
+                tripId: member.tripId,
                 email: member.email,
                 name: member.name,
                 status: member.status,
@@ -52,11 +66,17 @@ export class MemberService implements IMemberService {
         return this.memberRepository.getByEmail(email, tripId);
     }
 
-    confirm(id: string, tripId: string, dto: UpdateMemberDto): void {
-        return this.memberRepository.confirm(id, tripId, dto);
+    confirm(email: string, tripId: string, dto: UpdateMemberDto): void {
+        return this.memberRepository.confirm(email, tripId, dto);
     }
 
-    delete(id: string, tripId: string): void {
+    async delete(id: string, tripId: string) {
+        const member = await this.memberRepository.getById(id, tripId);
+
+        if (member.owner) {
+            throw new BadRequestException("The member owner cannot be deleted.");
+        }
+
         return this.memberRepository.delete(id, tripId);
     }
 }

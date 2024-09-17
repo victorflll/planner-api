@@ -60,9 +60,6 @@ export class MemberRepository implements IMemberRepository {
     async getById(id: string, tripId: string): Promise<Member> {
         const trip = await this.tripRepository.getById(tripId);
 
-        console.log(id);
-        console.log(tripId);
-
         const result = await this.prismaService.member.findUnique({
             where: {
                 id: id,
@@ -94,10 +91,10 @@ export class MemberRepository implements IMemberRepository {
         return result;
     }
 
-    async confirm(id: string, tripId: string, dto: UpdateMemberDto) {
+    async confirm(email: string, tripId: string, dto: UpdateMemberDto) {
         const trip = await this.tripRepository.getById(tripId);
 
-        const member = await this.getById(id, tripId);
+        const member = await this.getByEmail(email, tripId);
 
         await this.prismaService.member.update({
             where: {
@@ -115,6 +112,8 @@ export class MemberRepository implements IMemberRepository {
         const trip = await this.tripRepository.getById(tripId);
 
         const member = await this.getById(id, tripId);
+
+        if (!member) {}
 
         await this.prismaService.member.delete({
             where: {

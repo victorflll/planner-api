@@ -6,7 +6,7 @@ import {LocationModel} from "../../models/trip/location.model";
 export abstract class ITripRepository {
     abstract getCities(startsWith: string): Promise<LocationModel[]>;
 
-    abstract create(data: CreateTripDto): Promise<string>;
+    abstract create(data: CreateTripDto): Promise<Trip>;
 
     abstract get(): Promise<Trip[]>;
 

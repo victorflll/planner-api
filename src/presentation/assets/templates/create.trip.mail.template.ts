@@ -2,12 +2,9 @@ import {Trip} from "@prisma/client";
 import {ptBR} from "date-fns/locale";
 import {format} from "date-fns";
 
-export function mailTemplate(email: string, trip: Trip): string {
+export function createTripMailTemplate(email: string, trip: Trip): string {
     const startDate = format(new Date(trip.startDate), 'dd/MM/yyyy', { locale: ptBR });
     const endDate = format(new Date(trip.endDate), 'dd/MM/yyyy', { locale: ptBR });
-
-    const credentials = `mail=${email}&trip=${trip.id}`;
-    const codified = Buffer.from(credentials).toString('base64');
 
     return `<!DOCTYPE html>
             <html lang="pt-BR">
@@ -80,13 +77,13 @@ export function mailTemplate(email: string, trip: Trip): string {
             </head>
             <body>
                 <div class="container">
-                    <p>Você foi convidado(a) para participar de uma viagem para <strong>${trip.city} - ${trip.country}</strong> entre <strong>${startDate} a ${endDate}.</strong></p>
-                    <p>Para confirmar sua presença na viagem, clique no link abaixo:</p>
-                    <a href="http://localhost:3000/trip/confirmation?${codified}"">Confirmar presença</a>
+                    <p>Você realizou a criação de uma viagem para <strong>${trip.city} - ${trip.country}</strong> entre <strong>${startDate} a ${endDate}.</strong></p>
+                    <p>Para acessar a página principal da viagem, clique no link abaixo:</p>
+                    <a href="http://localhost:3000/trip/${trip.id}"">Acessar viagem</a>
                     <p>Caso você não saiba do que se trata esse e-mail ou não poderá estar presente, apenas ignore esse e-mail.</p>
                     <div class="footer">
                         <div class="logo">
-                            <img src="https://dummyimage.com/40x40/000/fff" alt="plann.er">
+                            <img src="../../../presentation/assets/images/planner-logo.png" alt="plann.er" width="40" height="40">
                         </div>
                         <p>plann.er</p>
                     </div>

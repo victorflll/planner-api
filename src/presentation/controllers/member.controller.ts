@@ -37,13 +37,13 @@ export class MemberController {
         return await this.memberService.getById(id, tripId);
     }
 
-    @Patch('confirm/:id')
+    @Patch('confirm/:email')
     update(
         @Body() data: UpdateMemberDto,
-        @Param('id') id: string,
+        @Param('email') email: string,
         @Query('tripId') tripId: string,
     ) {
-        return this.memberService.confirm(id, tripId, data);
+        return this.memberService.confirm(email, tripId, data);
     }
 
     @Delete('/:id')

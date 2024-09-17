@@ -1,6 +1,10 @@
 import {ApiProperty} from "@nestjs/swagger";
 
 export class MemberDto {
+    @ApiProperty({example: ''})
+    id: string;
+    @ApiProperty({example: ''})
+    tripId: string;
     @ApiProperty({ example: 'joao@email.com' })
     email: string;
     @ApiProperty({ example: 'João da Silva' })
